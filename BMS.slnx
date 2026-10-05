@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/BMS.Api/">
+    <Project Path="BMS.Api/BMS.API.csproj" />
+  </Folder>
+  <Project Path="BMS.Application/BMS.Application.csproj" />
+  <Project Path="BMS.Domain/BMS.Domain.csproj" />
+  <Project Path="BMS.Infrastructure/BMS.Infrastructure.csproj" />
+  <Project Path="BMS.Tests/BMS.Tests.csproj" />
+</Solution>

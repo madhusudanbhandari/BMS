@@ -1,0 +1,16 @@
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/bin/Debug/net10.0/BMS.Application.deps.json
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/bin/Debug/net10.0/BMS.Application.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/bin/Debug/net10.0/BMS.Application.pdb
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/bin/Debug/net10.0/BMS.Domain.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/bin/Debug/net10.0/BMS.Domain.pdb
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.csproj.AssemblyReference.cache
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.AssemblyInfoInputs.cache
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.AssemblyInfo.cs
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.csproj.CoreCompileInputs.cache
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.sourcelink.json
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Appl.4333919E.Up2Date
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/refint/BMS.Application.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/BMS.Application.pdb
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Application/obj/Debug/net10.0/ref/BMS.Application.dll

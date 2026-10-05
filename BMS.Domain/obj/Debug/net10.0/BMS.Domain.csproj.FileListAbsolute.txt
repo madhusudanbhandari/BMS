@@ -1,0 +1,12 @@
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/bin/Debug/net10.0/BMS.Domain.deps.json
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/bin/Debug/net10.0/BMS.Domain.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/bin/Debug/net10.0/BMS.Domain.pdb
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.AssemblyInfoInputs.cache
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.AssemblyInfo.cs
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.csproj.CoreCompileInputs.cache
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.sourcelink.json
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/refint/BMS.Domain.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/BMS.Domain.pdb
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Domain/obj/Debug/net10.0/ref/BMS.Domain.dll
