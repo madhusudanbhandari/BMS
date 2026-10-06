@@ -1,4 +1,5 @@
 using BMS.Domain.Entities;
+using BMS.Domain.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace BMS.Infrastructure.Data;
@@ -15,12 +16,16 @@ public class BmsDbContext : DbContext
     public DbSet<Team> Teams=>Set<Team>();
     public DbSet<Project> Projects=>Set<Project>();
     public DbSet<TaskItem> TaskItems=>Set<TaskItem>();
+    public DbSet<PAdmin> PAdmins=>Set<PAdmin>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<PAdmin>()
+                    .HasIndex(p=>p.Email)
+                    .IsUnique();
 
         modelBuilder.Entity<Organization>()
                     .HasMany(o=>o.Users)

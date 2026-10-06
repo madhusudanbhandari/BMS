@@ -2,7 +2,8 @@ namespace BMS.Domain.Entities.Enums;
 
 public enum UserRoles
 {
-    Admin=1,
-    Employee=2,
-    Manager=3,
+    OrganizationAdmin=1,
+    PlatformAdmin=2,
+    Employee=3,
+    Manager=4,
 }

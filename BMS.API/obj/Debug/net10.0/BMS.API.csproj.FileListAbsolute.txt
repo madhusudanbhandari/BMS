@@ -127,3 +127,13 @@
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/BCrypt-Net-Next.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.Bcl.Cryptography.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
