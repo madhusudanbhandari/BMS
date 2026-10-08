@@ -1,8 +1,7 @@
 namespace BMS.Domain.Entities;
 
-public class Team
+public class CreateTeamDto
 {
-    public int Id{get;set;}
     public string Name{get;set;}=string.Empty;
     public int OrganizationId{get;set;}
     public Organization Organization{get;set;}=null!;

@@ -7,5 +7,5 @@ public class VerifyUserDto
     public int UserId{get;set;}
     public UserRoles Role{get;set;}
 
-    public string Status{get;set;}=string.Empty;
+    public UserStatus Status{get;set;}
 }

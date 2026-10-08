@@ -5,5 +5,11 @@ namespace BMS.Application.Interface;
 
 public interface IAdminService
 {
-    public Task<User> VerifyUserRequest(VerifyUserDto verify);
+    public Task<ViewPendingUser> VerifyUserRequest(int adminId ,VerifyUserDto verify);
+
+    public Task<List<ViewPendingUser>> ViewAllPendingUsersAsync(int adminId );
+
+    
+
+
 }

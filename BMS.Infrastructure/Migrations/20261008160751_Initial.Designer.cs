@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BMS.Infrastructure.Migrations
 {
     [DbContext(typeof(BmsDbContext))]
-    [Migration("20261008114053_Initial")]
+    [Migration("20261008160751_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -148,9 +148,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Team", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -211,8 +213,8 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("MembersId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("TeamId")
+                        .HasColumnType("integer");
 
                     b.HasKey("MembersId", "TeamId");
 

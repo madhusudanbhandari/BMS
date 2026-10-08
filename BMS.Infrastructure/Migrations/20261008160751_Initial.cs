@@ -68,7 +68,8 @@ namespace BMS.Infrastructure.Migrations
                 name: "Teams",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     OrganizationId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -143,7 +144,7 @@ namespace BMS.Infrastructure.Migrations
                 columns: table => new
                 {
                     MembersId = table.Column<int>(type: "integer", nullable: false),
-                    TeamId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TeamId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

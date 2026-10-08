@@ -145,9 +145,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Team", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -208,8 +210,8 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("MembersId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("TeamId")
+                        .HasColumnType("integer");
 
                     b.HasKey("MembersId", "TeamId");
 
