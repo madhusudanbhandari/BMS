@@ -1,52 +1,44 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 
-namespace BMS.Infrastructure.Services;
+namespace BMS.Application.Service;
 
 public class AuthService : IAuthService
 {
     private readonly IAuthRepository _authRepository;
-    private readonly IConfiguration _configuration;
+    private readonly ITokenService _tokenService;
 
-    public AuthService(IAuthRepository authRepository,IConfiguration configuration)
+    public AuthService(IAuthRepository authRepository,ITokenService tokenService)
     {
         _authRepository=authRepository;
-        _configuration=configuration;
+        _tokenService=tokenService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
         var existingUser=await _authRepository.ExistingUserAsync(request.Email);
 
-        if(existingUser!=null)
+        if(existingUser)
             throw new Exception("Email already exists");
 
         var organization=new Organization
         {
-            Id=Guid.NewGuid(),
+            
             Name=request.OrganizationName,
             CreatedAt=DateTime.UtcNow,
         };
 
         var user=new User
         {
-            Id=Guid.NewGuid(),
             FirstName=request.FirstName,
             LastName=request.LastName,
             Email=request.Email,
-            Password=request.Password,
+            Password=BCrypt.Net.BCrypt.HashPassword(request.Password),
 
             Role=Domain.Entities.Enums.UserRoles.OrganizationAdmin,
 
-            OrganizationId=organization.Id
+            Organization=organization
         };
 
         await _authRepository.AddOrganizationAsync(organization);
@@ -55,7 +47,6 @@ public class AuthService : IAuthService
 
         return new AuthResponse
         {
-            Token=GenerateToken(user),
             OrganizationId=user.OrganizationId,
             UserId=user.Id,
             Role=user.Role.ToString()
@@ -77,7 +68,7 @@ public class AuthService : IAuthService
         
         return new AuthResponse
         {
-            Token=GenerateToken(user),
+            Token=_tokenService.GenerateTokenAsync(user),
             UserId=user.Id,
             OrganizationId=user.OrganizationId,
             Role=user.Role.ToString()
@@ -87,42 +78,42 @@ public class AuthService : IAuthService
 
     }
 
-    private string GenerateToken(User user)
-    {
-        var claims=new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-            new Claim(ClaimTypes.Email,user.Email.ToString()),
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
-            new Claim("OrganizationId",user.OrganizationId.ToString())
-        };
+    // private string GenerateToken(User user)
+    // {
+    //     var claims=new[]
+    //     {
+    //         new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+    //         new Claim(ClaimTypes.Email,user.Email.ToString()),
+    //         new Claim(ClaimTypes.Role, user.Role.ToString()),
+    //         new Claim("OrganizationId",user.OrganizationId.ToString())
+    //     };
 
-        var key=new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"]!
-            )
-        );
+    //     var key=new SymmetricSecurityKey(
+    //         Encoding.UTF8.GetBytes(
+    //             _configuration["Jwt:Key"]!
+    //         )
+    //     );
 
-        var credentials=new SigningCredentials(
-            key,
-            SecurityAlgorithms.HmacSha256
-        );
+    //     var credentials=new SigningCredentials(
+    //         key,
+    //         SecurityAlgorithms.HmacSha256
+    //     );
 
-        var token=new JwtSecurityToken(
-            issuer:_configuration["Jwt:Issuer"],
-            audience:_configuration["Jwt:Audience"],
-            claims:claims,
-            expires:DateTime.UtcNow.AddMinutes(
-                int.Parse(
-                    _configuration["Jwt:Expiratio"]!
-                )
-            ),
-            signingCredentials:credentials           
+    //     var token=new JwtSecurityToken(
+    //         issuer:_configuration["Jwt:Issuer"],
+    //         audience:_configuration["Jwt:Audience"],
+    //         claims:claims,
+    //         expires:DateTime.UtcNow.AddMinutes(
+    //             int.Parse(
+    //                 _configuration["Jwt:Expiration"]!
+    //             )
+    //         ),
+    //         signingCredentials:credentials           
 
-        );
+    //     );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
+    //     return new JwtSecurityTokenHandler().WriteToken(token);
+    // }
 
 
 }

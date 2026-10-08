@@ -137,3 +137,6 @@
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
 /Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Swashbuckle.AspNetCore.Swagger.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/bin/Debug/net10.0/Swashbuckle.AspNetCore.SwaggerUI.dll

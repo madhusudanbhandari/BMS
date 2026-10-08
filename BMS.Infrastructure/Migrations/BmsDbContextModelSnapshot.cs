@@ -24,9 +24,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Enums.PAdmin", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -57,9 +59,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Organization", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -75,9 +79,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Project", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -87,8 +93,8 @@ namespace BMS.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -99,12 +105,14 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.TaskItem", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid?>("AssignedToUserId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssignedToUserId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -116,8 +124,8 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -145,8 +153,8 @@ namespace BMS.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -157,9 +165,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -173,14 +183,17 @@ namespace BMS.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -192,8 +205,8 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("TeamUser", b =>
                 {
-                    b.Property<Guid>("MembersId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("MembersId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uuid");

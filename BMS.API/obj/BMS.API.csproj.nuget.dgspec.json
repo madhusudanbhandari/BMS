@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/BMS.API.csproj": {}
+    "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Api/BMS.API.csproj": {}
   },
   "projects": {
-    "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/BMS.API.csproj": {
+    "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Api/BMS.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/BMS.API.csproj",
+        "projectUniqueName": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Api/BMS.API.csproj",
         "projectName": "BMS.API",
-        "projectPath": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/BMS.API.csproj",
+        "projectPath": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Api/BMS.API.csproj",
         "packagesPath": "/Users/madhusudanbhandari/.nuget/packages/",
-        "outputPath": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.API/obj/",
+        "outputPath": "/Users/madhusudanbhandari/Desktop/BMS/BMS/BMS.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/madhusudanbhandari/.nuget/NuGet/NuGet.Config"
@@ -66,6 +66,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[10.0.12, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[10.2.3, )"
             }
           },
           "imports": [

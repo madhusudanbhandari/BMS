@@ -4,7 +4,7 @@ namespace BMS.Domain.Entities;
 
 public class TaskItem
 {
-    public Guid Id{get;set;}
+    public int Id{get;set;}
     public string Title{get;set;}=string.Empty;
     public string Description{get;set;}=string.Empty;
 
@@ -12,10 +12,10 @@ public class TaskItem
     public TaskPriorities Priority{get;set;}
 
     public DateTime? DueDate{get;set;}
-    public Guid ProjectId{get;set;}
+    public int ProjectId{get;set;}
     public Project Project{get;set;}=null!;
 
-    public Guid? AssignedToUserId{get;set;}
+    public int? AssignedToUserId{get;set;}
     public User? AssignedToUser{get;set;}
 
 

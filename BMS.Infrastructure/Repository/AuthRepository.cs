@@ -19,7 +19,7 @@ public class AuthRepository : IAuthRepository
         return await _context.Users.FirstOrDefaultAsync(u=>u.Email==email);
     }
 
-    public async Task<bool?> ExistingUserAsync(string email)
+    public async Task<bool> ExistingUserAsync(string email)
     {
         return await _context.Users.AnyAsync(u=>u.Email==email);
     }
