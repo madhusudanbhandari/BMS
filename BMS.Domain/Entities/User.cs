@@ -14,5 +14,6 @@ public class User
     public Organization Organization{get;set;}=null!;
 
     public UserStatus Status{get;set;}
+    public ICollection<Team> Teams{get;set;}=new List<Team>();
 
 }

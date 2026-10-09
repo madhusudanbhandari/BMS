@@ -53,7 +53,9 @@ public class BmsDbContext : DbContext
         
         modelBuilder.Entity<Team>()
                     .HasMany(t=>t.Members)
-                    .WithMany();
+                    .WithMany(u=>u.Teams);
+
+                    
 
     }
 
