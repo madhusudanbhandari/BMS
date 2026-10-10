@@ -5,9 +5,9 @@ namespace BMS.Application.Interface;
 
 public interface ITeamService
 {
-    public Task<ViewTeamDto> CreateTeamAsync(CreateTeamDto dto);
-    public Task<ViewTeamDto> AddMembersToTeamAsync(AddMembersToTeamDto dto);
-
-    public Task<bool?> RemoveMemberAsync(int teamId, int memberId);
-    public Task<bool?> DeleteTeamAsync(int teamId);
+    public Task<ViewTeamDto> CreateTeamAsync(int adminId,CreateTeamDto dto);
+    public Task<ViewTeamDto> AddMembersToTeamAsync(int adminId,AddMembersToTeamDto dto);
+    public Task<List<ViewTeamDto>> ViewAllTeamsAsync(int orgId);
+    public Task<bool?> RemoveMemberAsync(int adminId,int teamId, int memberId);
+    public Task<bool?> DeleteTeamAsync(int adminId,int teamId);
 }

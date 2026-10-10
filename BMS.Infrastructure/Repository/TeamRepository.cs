@@ -21,9 +21,12 @@ public class TeamRepository : ITeamRepository
         
     }
 
-    public async Task<List<Team>> ViewTeamsAsync()
+    public async Task<List<Team>> ViewTeamsAsync(int orgId)
     {
-        return await _context.Teams.ToListAsync();
+        return await _context.Teams
+                                .Where(t=>t.OrganizationId==orgId)
+                                .Include(t=>t.Members)
+                                .ToListAsync();
     }
 
     public async Task<User?> GetUserAsync(int userId)

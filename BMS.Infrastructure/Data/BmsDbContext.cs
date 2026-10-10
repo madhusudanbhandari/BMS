@@ -51,9 +51,23 @@ public class BmsDbContext : DbContext
                     .HasForeignKey(t=>t.ProjectId)
                     .OnDelete(DeleteBehavior.Cascade);
         
+
         modelBuilder.Entity<Team>()
-                    .HasMany(t=>t.Members)
-                    .WithMany(u=>u.Teams);
+                    .HasMany(t => t.Members)
+                    .WithMany(u => u.Teams)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "TeamUser",
+                        j => j.HasOne<User>()
+                            .WithMany()
+                            .HasForeignKey("MembersId"),
+                        j => j.HasOne<Team>()
+                            .WithMany()
+                            .HasForeignKey("TeamId"),
+                        j =>
+                        {
+                            j.HasKey("TeamId", "MembersId");
+                            j.ToTable("TeamUser");
+                        });
 
                     
 
