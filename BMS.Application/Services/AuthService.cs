@@ -43,6 +43,7 @@ public class AuthService : IAuthService
             FirstName=newUser.FirstName,
             LastName=newUser.LastName,
             Email=newUser.Email,
+            Role=newUser.Role.ToString(),
             OrganizationId=newUser.OrganizationId
         };        
     }
@@ -111,7 +112,7 @@ public class AuthService : IAuthService
         user.FirstName=dto.FirstName;
         user.LastName=dto.LastName;
         user.Email=dto.Email;
-        user.Password=dto.Password;
+        user.Password=BCrypt.Net.BCrypt.HashPassword(dto.Password);
         user.Role=dto.UserRoles;
         user.OrganizationId=dto.OrganizationId;
 
@@ -135,7 +136,7 @@ public class AuthService : IAuthService
 
         if(requested==null || target == null)
         {
-            throw new Exception("User cannot be null");
+            throw new Exception("User not found");
         }
         if (requested.OrganizationId != target.OrganizationId)
         {
@@ -162,6 +163,7 @@ public class AuthService : IAuthService
         }
 
         await _authRepository.DeleteUserAsync(user);
+        await _authRepository.SaveChangesAsync();
         return true;
     }
 }

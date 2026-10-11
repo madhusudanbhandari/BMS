@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -54,5 +55,18 @@ public class ProjectController : ControllerBase
     {
         var deleted=await _projectService.DeleteProjectAsync(projId);
         return Ok(deleted);
+    }
+
+    [Authorize(Roles ="Manager, OrganizationAdmin")]
+    [HttpPost("assign-team")]
+    public async Task<IActionResult> AssignTeam(AssignTeamDto dto)
+    {
+        var requestedId=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        int.TryParse(requestedId,out int reqId);
+
+        var assigned=await _projectService.AssignTeamAsync(reqId,dto);
+
+        return Ok(assigned);
     }
 }

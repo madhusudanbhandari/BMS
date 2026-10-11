@@ -11,4 +11,7 @@ public interface IProjectService
     public Task<ViewProjectDto?> UpdateProjectAsync(int projId, UpdateProjectDto dto);
 
     public Task<bool?> DeleteProjectAsync(int projId);
+
+
+    public Task<ViewProjectDto> AssignTeamAsync(int reqId,AssignTeamDto dto);
 }

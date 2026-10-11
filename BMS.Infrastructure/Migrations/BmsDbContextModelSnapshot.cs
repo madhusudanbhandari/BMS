@@ -96,9 +96,14 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("OrganizationId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Projects");
                 });
@@ -207,17 +212,17 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("TeamUser", b =>
                 {
-                    b.Property<int>("MembersId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
-                    b.HasKey("MembersId", "TeamId");
+                    b.Property<int>("MembersId")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("TeamId");
+                    b.HasKey("TeamId", "MembersId");
 
-                    b.ToTable("TeamUser");
+                    b.HasIndex("MembersId");
+
+                    b.ToTable("TeamUser", (string)null);
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.Project", b =>
@@ -228,7 +233,13 @@ namespace BMS.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BMS.Domain.Entities.Team", "Team")
+                        .WithMany("Projects")
+                        .HasForeignKey("TeamId");
+
                     b.Navigation("Organization");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.TaskItem", b =>
@@ -297,6 +308,11 @@ namespace BMS.Infrastructure.Migrations
             modelBuilder.Entity("BMS.Domain.Entities.Project", b =>
                 {
                     b.Navigation("TaskItems");
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.Team", b =>
+                {
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }
