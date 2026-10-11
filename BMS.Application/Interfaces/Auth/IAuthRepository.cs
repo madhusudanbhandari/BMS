@@ -2,10 +2,12 @@ using BMS.Domain.Entities;
 
 namespace BMS.Application.Interface;
 
-public interface IUserRepository
+public interface IAuthRepository
 {
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetUserByIdAsync(int id);
     Task AddUserAsync(User user);
+
+    Task DeleteUserAsync(User user);
     Task SaveChangesAsync();
 }

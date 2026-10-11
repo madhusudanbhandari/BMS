@@ -16,11 +16,11 @@ builder.Services.AddDbContext<BmsDbContext>(options=>
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IOrgRepository, OrgRepository>();
+builder.Services.AddScoped<IOrgService, OrgService>();
+builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService,TokenService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAdminRepository,AdminRepository>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();

@@ -2,7 +2,7 @@ using BMS.Domain.Entities;
 
 namespace BMS.Application.Interface;
 
-public interface IAuthRepository
+public interface IOrgRepository
 {
     Task<User?> GetUserByEmailAsync(string emial);
     Task<bool> ExistingUserAsync(string email);

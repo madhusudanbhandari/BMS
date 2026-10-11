@@ -7,21 +7,21 @@ namespace BMS.Application.Service;
 public class TeamService : ITeamService
 {
     private readonly ITeamRepository _teamRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IAuthRepository _authRepository;
     public TeamService(
         ITeamRepository teamRepository,
-        IUserRepository userRepository
+        IAuthRepository authRepository
     )
     {
         _teamRepository=teamRepository;
-        _userRepository=userRepository;
+        _authRepository=authRepository;
     }
 
     
     public async Task<ViewTeamDto> CreateTeamAsync(int adminId,CreateTeamDto dto)
     {
 
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
         
         var organization=admin?.OrganizationId;
 
@@ -62,7 +62,7 @@ public class TeamService : ITeamService
     public async Task<List<ViewTeamDto>> ViewAllTeamsAsync(int memberId)
     {
 
-        var member=await _userRepository.GetUserByIdAsync(memberId);
+        var member=await _authRepository.GetUserByIdAsync(memberId);
         
         if (member == null)
         {
@@ -95,7 +95,7 @@ public class TeamService : ITeamService
     public async Task<ViewTeamDto> AddMembersToTeamAsync(int adminId,AddMembersToTeamDto dto)
     {
 
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
 
         var adminOrganization=admin?.OrganizationId;
 
@@ -153,7 +153,7 @@ public class TeamService : ITeamService
     public async Task<bool?> RemoveMemberAsync(int adminId,int teamId, int memberId)
         {
 
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
         var orgId=admin?.OrganizationId;
 
         var team=await _teamRepository.GetTeamAsync(teamId);
@@ -195,7 +195,7 @@ public class TeamService : ITeamService
 
     public async Task<bool?> DeleteTeamAsync(int adminId,int teamId)
     {
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
 
         var orgId=admin?.OrganizationId;
 

@@ -8,11 +8,11 @@ namespace BMS.Application.Service;
 public class AdminService : IAdminService
 {
     private readonly IAdminRepository _adminRepository;
-    private readonly IUserRepository _userRepository;
-    public AdminService(IAdminRepository adminRepository,IUserRepository userRepository)
+    private readonly IAuthRepository _authRepository;
+    public AdminService(IAdminRepository adminRepository,IAuthRepository authRepository)
     {
         _adminRepository=adminRepository;
-        _userRepository=userRepository;
+        _authRepository=authRepository;
     }
 
     public async Task<List<ViewPendingUser>> ViewAllPendingUsersAsync(int adminId)
@@ -20,7 +20,7 @@ public class AdminService : IAdminService
 
         //get the admin from the adminId, then get Its organizationID to allow only admin of the same organization to verify requests to that organization
 
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
         if (admin == null)
         {
             throw new Exception("Cannot find the admin");
@@ -43,7 +43,7 @@ public class AdminService : IAdminService
 
     public async Task<ViewPendingUser> VerifyUserRequest(int adminId,VerifyUserDto dto)
     {
-        var admin=await _userRepository.GetUserByIdAsync(adminId);
+        var admin=await _authRepository.GetUserByIdAsync(adminId);
         if(admin==null)
             throw new Exception("cannot find exception");
 
@@ -61,7 +61,7 @@ public class AdminService : IAdminService
         user.Role=dto.Role;
         user.Status=dto.Status;
 
-        await _userRepository.SaveChangesAsync();
+        await _authRepository.SaveChangesAsync();
 
         return new ViewPendingUser
         {

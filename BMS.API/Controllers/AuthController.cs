@@ -1,6 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using BMS.Application.Interface;
+using System.Security.Claims;
 using BMS.Application.Dtos;
+using BMS.Application.Interface;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 namespace BMS.Api.Controller;
 
 [ApiController]
@@ -14,18 +17,51 @@ public class AuthController : ControllerBase
         _authService=authService;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync(RegisterRequest request)
+    [AllowAnonymous]
+    [HttpPost("register-user")]
+    public async Task<IActionResult> RegisterUserAsync(UserRegisterRequest request)
     {
-        var registered=await _authService.RegisterAsync(request);
-        return Ok(registered);
+        var user=await _authService.RegisterRequestAsync(request);
+        return Ok(user);
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(LoginRequest request)
+    [AllowAnonymous]
+    [HttpPost("login-user")]
+    public async Task<IActionResult> LoginUserAsync(UserLoginRequest request)
     {
-        var logger=await _authService.LoginAsync(request);
-        return Ok(logger);
+        var login=await _authService.LoginRequestAsync(request);
+        return Ok(login);
     }
-    
+
+    [Authorize]
+    [HttpPatch("update-user")]
+    public async Task<IActionResult> UpdateUserAsync(string targetUserEmail,UpdateUserDto dto)
+    {
+        var requestedUserEmail=User.FindFirstValue(ClaimTypes.Email);
+
+        if (requestedUserEmail == null)
+        {
+            throw new Exception("User does not exists");
+        }
+        
+        var updated=await _authService.UpdateUserAsync(requestedUserEmail,targetUserEmail, dto);
+
+        return Ok(updated);
+    }
+
+    [Authorize]
+    [HttpDelete("delete-user")]
+    public async Task<IActionResult> DeleteUserAsync(string targetUserEmail)
+    {
+        var requestedUserEmail=User.FindFirstValue(ClaimTypes.Email);
+
+        if (requestedUserEmail == null)
+        {
+            throw new Exception("User does not exists");
+        }
+
+        var deleted=await _authService.DeleteUserAsync(requestedUserEmail,targetUserEmail);
+
+        return Ok(deleted);
+    }
 }

@@ -1,4 +1,3 @@
-using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
 using BMS.Infrastructure.Data;
@@ -6,30 +5,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BMS.Infrastructure.Repository;
 
-public class UserRepository : IUserRepository
+public class OrgRepository : IOrgRepository
 {
     private readonly BmsDbContext _context;
-
-    public UserRepository(BmsDbContext context)
+    
+    public OrgRepository(BmsDbContext context)
     {
         _context=context;
     }
+
     public async Task<User?> GetUserByEmailAsync(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(u=>u.Email==email);
-
     }
 
-    public async Task<User?> GetUserByIdAsync(int id)
+    public async Task<bool> ExistingUserAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u=>u.Id==id);
+        return await _context.Users.AnyAsync(u=>u.Email==email);
     }
+
+    public async Task AddOrganizationAsync(Organization organization)
+    {
+        await _context.Organizations.AddAsync(organization);
+    }
+
     public async Task AddUserAsync(User user)
     {
         await _context.Users.AddAsync(user);
     }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
     }
+
 }

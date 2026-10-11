@@ -7,3 +7,4 @@ public enum UserStatus
     Approved=2,
     Rejected=3
 }
+

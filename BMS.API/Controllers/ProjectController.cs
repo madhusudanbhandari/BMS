@@ -1,9 +1,11 @@
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BMS.Api.Controller;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProjectController : ControllerBase
@@ -14,6 +16,7 @@ public class ProjectController : ControllerBase
         _projectService=projectService;
     }
 
+    [Authorize(Roles ="Manager,OrganizationAdmin")]
     [HttpPost("create-project")]
     public async Task<IActionResult> CreateProject(CreateProjectDto dto)
     {
@@ -37,6 +40,7 @@ public class ProjectController : ControllerBase
         return Ok(projects);
     }
 
+    [Authorize(Roles ="Manager,OrganizationAdmin")]
     [HttpPatch("update-project")]
     public async Task<IActionResult> UpdateProjectAsync(int projId,UpdateProjectDto dto)
     {
@@ -44,6 +48,7 @@ public class ProjectController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize(Roles ="Manager,OrganizationAdmin")]
     [HttpDelete("delete-project")]
     public async Task<IActionResult> DeleteProjectAsync(int projId)
     {
