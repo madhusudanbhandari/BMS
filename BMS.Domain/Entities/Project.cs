@@ -1,3 +1,5 @@
+using BMS.Domain.Entities.enums;
+
 namespace BMS.Domain.Entities;
 
 
@@ -11,6 +13,7 @@ public class Project
     public Organization Organization{get;set;}=null!;
     public int? TeamId{get;set;}
     public Team? Team{get;set;}
-    
+
+    public ProjectStatus projectStatus{get;set;}    
     public ICollection<TaskItem> TaskItems{get;set;}=new List<TaskItem>();
 }

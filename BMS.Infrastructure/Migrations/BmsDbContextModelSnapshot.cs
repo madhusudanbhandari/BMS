@@ -99,6 +99,9 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int?>("TeamId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("projectStatus")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrganizationId");

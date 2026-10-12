@@ -24,7 +24,7 @@ public class ProjectService : IProjectService
         {
             Name=dto.Name,
             Description=dto.Description,
-
+            projectStatus=Domain.Entities.enums.ProjectStatus.Pending,
             OrganizationId=dto.OrganizationId,
             
         };
@@ -37,6 +37,7 @@ public class ProjectService : IProjectService
             Id=project.Id,
             Name=project.Name,
             Description=project.Description,
+            projectStatus=project.projectStatus,
             OrganizationId=project.OrganizationId
         };
     }
@@ -55,6 +56,7 @@ public class ProjectService : IProjectService
             Id=project.Id,
             Name=project.Name,
             Description=project.Description,
+            projectStatus=project.projectStatus,
             OrganizationId=project.OrganizationId
         }; 
     }
@@ -68,6 +70,7 @@ public class ProjectService : IProjectService
             Id=project.Id,
             Name=project.Name,
             Description=project.Description,
+            projectStatus=project.projectStatus,
             OrganizationId=project.OrganizationId
         }).ToList();
 
@@ -83,6 +86,7 @@ public class ProjectService : IProjectService
         }
 
         project.Name=dto.Name;
+        project.projectStatus=dto.projectStatus;
         project.Description=dto.Description;
         project.OrganizationId=dto.OrganizationId;
 
@@ -91,6 +95,7 @@ public class ProjectService : IProjectService
             Id=project.Id,
             Name=project.Name,
             Description=project.Description,
+            projectStatus=project.projectStatus,
             OrganizationId=project.OrganizationId
         };
     }
@@ -142,6 +147,7 @@ public class ProjectService : IProjectService
         }
 
         project.TeamId=dto.TeamId;
+        project.projectStatus=Domain.Entities.enums.ProjectStatus.Assigned;
 
         await _projectRepository.SaveChangesAsync();
 
@@ -150,6 +156,7 @@ public class ProjectService : IProjectService
             Id=project.Id,
             Name=project.Name,
             Description=project.Description,
+            projectStatus=project.projectStatus,
             OrganizationId=project.OrganizationId
         };
 

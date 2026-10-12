@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BMS.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3c9b65f22717c2d02c028f62fca13253cda84ff7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5bfb54a18a332bbbe9a2c2faacc6af1e969e7b35")]
 [assembly: System.Reflection.AssemblyProductAttribute("BMS.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BMS.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
