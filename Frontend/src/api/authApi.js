@@ -10,3 +10,10 @@ export const loginUser=async(credentials)=>{
     return response.data;
 }
 
+export const registerOrganization = async (data) => {
+  const response = await api.post(
+    "/Org/register-organization",
+    data
+  );
+  return response.data;
+};

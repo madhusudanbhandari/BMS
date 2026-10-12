@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Pages/LoginPage";
-import Register from "./Pages/RegisterPage";
+import Register from "./Pages/Register";
+import RegisterOrganization from "./Pages/ORegisterPage";
 
 function Dashboard() {
   return <h1>WorkSphere Dashboard</h1>;
@@ -18,7 +19,10 @@ export default function App() {
       <Routes>
        <Route path="/login" element={<Login />} /> 
         <Route path="/register" element={<Register />} />
-
+                  <Route
+          path="/register-organization"
+          element={<RegisterOrganization />}
+        />
 
         <Route
           path="/dashboard"
