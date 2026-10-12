@@ -37,7 +37,7 @@ export default function Login() {
 
       localStorage.setItem("token", token);
 
-      navigate("/dashboard");
+      navigate("/admin");
     } catch (err) {
       setError(
         err.response?.data?.message ??
