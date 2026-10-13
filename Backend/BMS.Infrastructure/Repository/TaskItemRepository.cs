@@ -15,13 +15,16 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<TaskItem?> GetTaskItemByIdAsync(int id)
     {
-        return await _context.TaskItems.FirstOrDefaultAsync(t=>t.Id==id);
+        return await _context.TaskItems
+                                .Include(ti=>ti.Project)
+                                .FirstOrDefaultAsync(t=>t.Id==id);
     }
 
     public async Task<List<TaskItem>> GetTaskItemsAsync(int ProjId)
     {
         return await _context.TaskItems
                                     .Where(t=>t.ProjectId==ProjId)
+                                    .Include(t=>t.Project)
                                     .ToListAsync();
     }
 

@@ -21,14 +21,21 @@ public class ProjectController : ControllerBase
     [HttpPost("create-project")]
     public async Task<IActionResult> CreateProject(CreateProjectDto dto)
     {
-        var project=await _projectService.CreateProjectAsync(dto);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int id);
+
+        var project=await _projectService.CreateProjectAsync(id,dto);
         return Ok(project);
     }
 
     [HttpGet("view-project")]
     public async Task<IActionResult> ViewProject(int projId)
     {
-        var project=await _projectService.ViewProjectByIdAsync(projId);
+
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int id);
+
+        var project=await _projectService.ViewProjectByIdAsync(id,projId);
 
         return Ok(project);
     }
@@ -36,7 +43,11 @@ public class ProjectController : ControllerBase
     [HttpGet("view-all-projects")]
     public async Task<IActionResult> ViewAllProjects(int orgId)
     {
-        var projects=await _projectService.ViewAllProjectsAsync(orgId);
+        
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int id);
+
+        var projects=await _projectService.ViewAllProjectsAsync(id,orgId);
 
         return Ok(projects);
     }
@@ -45,7 +56,10 @@ public class ProjectController : ControllerBase
     [HttpPatch("update-project")]
     public async Task<IActionResult> UpdateProjectAsync(int projId,UpdateProjectDto dto)
     {
-        var updated=await _projectService.UpdateProjectAsync(projId,dto);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int id);
+
+        var updated=await _projectService.UpdateProjectAsync(id,projId,dto);
         return Ok(updated);
     }
 
@@ -53,7 +67,11 @@ public class ProjectController : ControllerBase
     [HttpDelete("delete-project")]
     public async Task<IActionResult> DeleteProjectAsync(int projId)
     {
-        var deleted=await _projectService.DeleteProjectAsync(projId);
+        
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int id);
+
+        var deleted=await _projectService.DeleteProjectAsync(id,projId);
         return Ok(deleted);
     }
 

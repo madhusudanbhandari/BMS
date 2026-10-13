@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Infrastructure.Repository;
@@ -31,7 +32,10 @@ public class TaskItemController : ControllerBase
     [HttpPatch("update-taskItem")]
     public async Task<IActionResult> UpdateTaskItemAsync(int id, UpdateTaskItemDto dto)
     {
-        var taskItem=await _taskItemService.UpdateTaskItemAsync(id, dto);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int reqid);
+
+        var taskItem=await _taskItemService.UpdateTaskItemAsync(reqid,id, dto);
 
         return Ok(taskItem);
     }
@@ -39,14 +43,20 @@ public class TaskItemController : ControllerBase
     [HttpGet("taskItem/{id}")]
     public async Task<IActionResult> ViewTaskItemAsync(int id)
     {
-        var taskId=await _taskItemService.ViewTaskItemAsync(id);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int reqid);
+
+        var taskId=await _taskItemService.ViewTaskItemAsync(reqid,id);
         return Ok(taskId);
     }
 
     [HttpGet("taskItems")]
     public async Task<IActionResult> ViewAllTaskItemsAsync(int projId)
     {
-        var taskItems=await _taskItemService.ViewAllTaskItems(projId);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int reqid);
+
+        var taskItems=await _taskItemService.ViewAllTaskItems(reqid,projId);
 
         return Ok(taskItems);
     }
@@ -54,7 +64,10 @@ public class TaskItemController : ControllerBase
     [HttpDelete("delete-taskItems")]
     public async Task<IActionResult> DeleteTaskItem(int id)
     {
-        var deleted=await _taskItemService.DeleteTaskItemAsync(id);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(requester,out int reqid);
+
+        var deleted=await _taskItemService.DeleteTaskItemAsync(reqid,id);
         return Ok(deleted);
     }
 

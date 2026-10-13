@@ -18,14 +18,22 @@ public class ProjectService : IProjectService
         _authRepository=authRepository;
     }
 
-    public async Task<ViewProjectDto> CreateProjectAsync(CreateProjectDto dto)
+    public async Task<ViewProjectDto> CreateProjectAsync(int requesterId,CreateProjectDto dto)
     {
+        var requester=await _authRepository.GetUserByIdAsync(requesterId);
+        if (requester == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+        var orgId=requester.OrganizationId;
+
         var project=new Project
         {
             Name=dto.Name,
             Description=dto.Description,
             projectStatus=Domain.Entities.enums.ProjectStatus.Pending,
-            OrganizationId=dto.OrganizationId,
+            OrganizationId=orgId,
             
         };
 
@@ -42,13 +50,28 @@ public class ProjectService : IProjectService
         };
     }
 
-    public async Task<ViewProjectDto?> ViewProjectByIdAsync(int projId)
+    public async Task<ViewProjectDto?> ViewProjectByIdAsync(int requesterId,int projId)
     {
+        var requester=await _authRepository.GetUserByIdAsync(requesterId);
+        if (requester == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+        var orgId=requester.OrganizationId;
+
         var project=await _projectRepository.GetProjectByIdAsync(projId);
 
         if (project == null)
         {
             throw new Exception("Cannot find the project");
+        }
+
+        var projOrg=project.OrganizationId;
+
+        if (orgId != projOrg)
+        {
+            throw new Exception("You cannot control this organization");
         }
 
         return new ViewProjectDto
@@ -61,8 +84,22 @@ public class ProjectService : IProjectService
         }; 
     }
 
-    public async Task<List<ViewProjectDto>> ViewAllProjectsAsync(int orgId)
+    public async Task<List<ViewProjectDto>> ViewAllProjectsAsync(int requesterId,int orgId)
     {
+        var requester=await _authRepository.GetUserByIdAsync(requesterId);
+        if (requester == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+        var reqOrg=requester.OrganizationId;
+
+
+
+        if (orgId != reqOrg)
+        {
+            throw new Exception("You cannot control this organization");
+        }
         var projects=await _projectRepository.GetAllProjectsAsync(orgId);
 
         return projects.Select(project=>new ViewProjectDto
@@ -76,8 +113,18 @@ public class ProjectService : IProjectService
 
     }
 
-    public async Task<ViewProjectDto?> UpdateProjectAsync(int projId, UpdateProjectDto dto)
+    public async Task<ViewProjectDto?> UpdateProjectAsync(int requesterId,int projId, UpdateProjectDto dto)
     {
+        var requester=await _authRepository.GetUserByIdAsync(requesterId);
+
+        if (requester == null)
+        {
+            throw new Exception("User is null");
+        }
+
+        var orgId=requester.OrganizationId;
+
+
         var project=await _projectRepository.GetProjectByIdAsync(projId);
 
         if (project == null)
@@ -88,7 +135,7 @@ public class ProjectService : IProjectService
         project.Name=dto.Name;
         project.projectStatus=dto.projectStatus;
         project.Description=dto.Description;
-        project.OrganizationId=dto.OrganizationId;
+        project.OrganizationId=orgId;
 
         return new ViewProjectDto
         {
@@ -100,13 +147,27 @@ public class ProjectService : IProjectService
         };
     }
 
-    public async Task<bool?> DeleteProjectAsync(int projId)
+    public async Task<bool?> DeleteProjectAsync(int requesterId,int projId)
     {
-        var project=await _projectRepository.GetProjectByIdAsync(projId);
+        var requester=await _authRepository.GetUserByIdAsync(requesterId);
 
+        if (requester == null)
+        {
+            throw new Exception("User is null");
+        }
+
+        var orgId=requester.OrganizationId;
+
+        var project=await _projectRepository.GetProjectByIdAsync(projId);
         if (project == null)
         {
             throw new Exception("Cannot find the project");
+        }
+        var projOrg=project.OrganizationId;
+
+        if (orgId != projOrg)
+        {
+            throw new Exception("You cant control this organization");
         }
 
         await _projectRepository.RemoveProjectAsync(project);
