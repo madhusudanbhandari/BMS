@@ -40,3 +40,17 @@ export const verifyUser = async (data) => {
   const response = await api.patch("/Admin/verify-users", data);
   return response.data;
 };
+
+export const getProjects = async (orgId) => {
+  const response = await api.get("/Project/view-all-projects",{
+    params:{orgId},
+  });
+  return response.data;
+};
+
+export const getTasks = async (projId) => {
+  const response = await api.get("/TaskItem/taskItems",{
+    params:{projId}
+  });
+  return response.data;
+};

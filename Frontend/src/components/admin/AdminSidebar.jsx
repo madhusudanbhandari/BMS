@@ -20,7 +20,7 @@ const navigation = [
   },
   { label: "Team Management", path: "/admin/teams", icon: UsersRound },
   { label: "Projects", path: "/admin/projects", icon: FolderKanban },
-  { label: "Tasks", path: "/admin/tasks", icon: Users },
+  { label: "Tasks", path: "/admin/task-management", icon: Users },
   { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
 

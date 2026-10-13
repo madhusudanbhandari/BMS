@@ -26,8 +26,14 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    
     try {
       const data = await loginUser(formData);
+
+      console.log("Login response:", data);
+      console.log("Role:", data.role);
+      console.log("User role:", data.user?.role);
+      console.log("User Role:", data.user?.Role);
 
       const token = data.token ?? data.accessToken;
 
@@ -37,7 +43,31 @@ export default function Login() {
 
       localStorage.setItem("token", token);
 
-      navigate("/admin");
+      const role = data.role ?? data.user?.role ?? data.user?.Role;
+
+      switch (role) {
+        case "PlatformAdmin":
+            navigate("/Padmmin");
+
+        case "OrganizationAdmin":
+          navigate("/admin");
+          break;
+
+        case "Employee":
+          navigate("/employee");
+          break;
+
+        case "Manager":
+          navigate("/manager");
+          break;
+        
+          case "HR":
+            navigate("/hr")
+            break;
+
+        default:
+          throw new Error("Unknown or missing user role.");
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ??
@@ -47,8 +77,8 @@ export default function Login() {
       );
     } finally {
       setLoading(false);
-    }
-  };
+    }}
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
