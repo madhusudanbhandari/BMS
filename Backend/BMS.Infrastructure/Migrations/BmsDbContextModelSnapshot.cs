@@ -111,6 +111,47 @@ namespace BMS.Infrastructure.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Salary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccountNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ReleasedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SalaryStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Salary");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -245,6 +286,15 @@ namespace BMS.Infrastructure.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Salary", b =>
+                {
+                    b.HasOne("BMS.Domain.Entities.User", "User")
+                        .WithOne("Salary")
+                        .HasForeignKey("BMS.Domain.Entities.Salary", "UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.TaskItem", b =>
                 {
                     b.HasOne("BMS.Domain.Entities.User", "AssignedToUser")
@@ -316,6 +366,11 @@ namespace BMS.Infrastructure.Migrations
             modelBuilder.Entity("BMS.Domain.Entities.Team", b =>
                 {
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Salary");
                 });
 #pragma warning restore 612, 618
         }

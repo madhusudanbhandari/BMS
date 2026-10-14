@@ -20,8 +20,31 @@ public class TaskItemService : ITaskItemService
     }
 
 
-    public async Task<ViewTaskItemDto> CreateTaskItemAsync(CreateTaskItemDto dto)
+    public async Task<ViewTaskItemDto> CreateTaskItemAsync(int reqId,CreateTaskItemDto dto)
     {
+        var requester=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (requester == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+        var reqOrg=requester.OrganizationId;
+
+        var project=await _projectRepository.GetProjectByIdAsync(dto.ProjectId);
+        if (project == null)
+        {
+            throw new Exception("Cannot find the project");
+        }
+
+        var projOrg=project.OrganizationId;
+
+        if (reqOrg != projOrg)
+        {
+            throw new Exception("You cannot create the taskItem for others project");
+        }
+
+
        var taskItem=new TaskItem
        {
            Title=dto.Title,
@@ -29,7 +52,7 @@ public class TaskItemService : ITaskItemService
            Status=dto.Status,
            Priority=dto.Priority,
            DueDate=dto.DueDate,
-           ProjectId=dto.ProjectId,
+           ProjectId=project.Id,
            AssignedToUserId=dto.AssignedToUserId
 
        } ;
@@ -143,28 +166,36 @@ public class TaskItemService : ITaskItemService
         
     }
 
-    public async Task<List<ViewTaskItemDto>> ViewAllTaskItems(int requesterId,int teamId)
+    public async Task<List<ViewTaskItemDto>> ViewAllTaskItems(int requesterId,int projId)
     {
-        var taskItems=await _taskItemRepository.GetTaskItemsAsync(teamId);
 
-        var team=await _teamRepository.GetTeamAsync(teamId);
-        if (team == null)
+        var project=await _projectRepository.GetProjectByIdAsync(projId);
+
+        if (project == null)
         {
-            throw new Exception("Cannot find the team");
+            throw new Exception("Cannot find the project");
         }
-        var orgId=team.OrganizationId;
+
+        var projOrg=project.OrganizationId;
 
         var user=await _authRepository.GetUserByIdAsync(requesterId);
+
         if (user == null)
         {
-            throw new Exception("cannot find the user");
+            throw new Exception("Cannot find the userId");
         }
-        var userOrg=user.OrganizationId;
 
-        if (orgId != userOrg)
+        var reqOrg=user.OrganizationId;
+
+        if (projOrg != reqOrg)
         {
-            throw new InvalidOperationException("You cant control this item");
+            throw new Exception("You cannot view the projects of this organization");
         }
+
+        var taskItems=await _taskItemRepository.GetTaskItemsAsync(project.Id);
+
+
+
 
         return taskItems.Select(taskItem=>new ViewTaskItemDto
         {

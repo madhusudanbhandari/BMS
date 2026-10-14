@@ -16,4 +16,6 @@ public class User
     public UserStatus Status{get;set;}
     public ICollection<Team> Teams{get;set;}=new List<Team>();
 
+    public Salary? Salary{get;set;}    
+
 }

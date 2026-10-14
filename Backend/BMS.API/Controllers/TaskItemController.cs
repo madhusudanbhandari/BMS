@@ -23,7 +23,10 @@ public class TaskItemController : ControllerBase
     [HttpPost("create-taskItem")]
     public async Task<IActionResult> CreateTaskItemAsync(CreateTaskItemDto dto)
     {
-        var taskItem=await _taskItemService.CreateTaskItemAsync(dto);
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        int.TryParse(requester, out int id);
+        var taskItem=await _taskItemService.CreateTaskItemAsync(id,dto);
         return Ok(taskItem);
 
     }

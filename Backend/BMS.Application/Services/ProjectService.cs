@@ -132,10 +132,15 @@ public class ProjectService : IProjectService
             throw new Exception("Project Does not exists");
         }
 
+        var projOrg=project.OrganizationId;
+        if (orgId != projOrg)
+        {
+            throw new Exception("You cannot control this organization");
+        }
+
         project.Name=dto.Name;
         project.projectStatus=dto.projectStatus;
         project.Description=dto.Description;
-        project.OrganizationId=orgId;
 
         return new ViewProjectDto
         {

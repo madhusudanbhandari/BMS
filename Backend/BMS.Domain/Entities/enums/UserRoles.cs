@@ -6,4 +6,5 @@ public enum UserRoles
     PlatformAdmin=2,
     Employee=3,
     Manager=4,
+    HR=5
 }

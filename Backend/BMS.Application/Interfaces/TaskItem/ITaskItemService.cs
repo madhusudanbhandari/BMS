@@ -4,7 +4,7 @@ namespace BMS.Application.Interface;
 
 public interface ITaskItemService
 {
-    public Task<ViewTaskItemDto> CreateTaskItemAsync(CreateTaskItemDto dto);
+    public Task<ViewTaskItemDto> CreateTaskItemAsync(int id,CreateTaskItemDto dto);
     public Task<ViewTaskItemDto> UpdateTaskItemAsync(int reqid,int id,UpdateTaskItemDto dto);
     public Task<ViewTaskItemDto?> ViewTaskItemAsync(int reqId,int id);
     public Task<List<ViewTaskItemDto>> ViewAllTaskItems(int reqId,int projId);

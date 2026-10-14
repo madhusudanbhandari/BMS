@@ -69,6 +69,7 @@ public class AuthService : IAuthService
             LastName=existingUser.LastName,
             Email=existingUser.Email,
             OrganizationId=existingUser.OrganizationId,
+            Role=existingUser.Role.ToString(),
 
             Token=_tokenService.GenerateTokenAsync(existingUser)
         };

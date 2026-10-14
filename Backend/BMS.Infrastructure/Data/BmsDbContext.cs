@@ -17,6 +17,7 @@ public class BmsDbContext : DbContext
     public DbSet<Project> Projects=>Set<Project>();
     public DbSet<TaskItem> TaskItems=>Set<TaskItem>();
     public DbSet<PAdmin> PAdmins=>Set<PAdmin>();
+    public DbSet<Salary> Salary=>Set<Salary>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
