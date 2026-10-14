@@ -123,8 +123,9 @@ namespace BMS.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("AccountNumber")
-                        .HasColumnType("integer");
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
@@ -132,7 +133,10 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("ReleasedAt")
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ReleasedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("RequestedAt")
@@ -141,7 +145,7 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("SalaryStatus")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -290,7 +294,9 @@ namespace BMS.Infrastructure.Migrations
                 {
                     b.HasOne("BMS.Domain.Entities.User", "User")
                         .WithOne("Salary")
-                        .HasForeignKey("BMS.Domain.Entities.Salary", "UserId");
+                        .HasForeignKey("BMS.Domain.Entities.Salary", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

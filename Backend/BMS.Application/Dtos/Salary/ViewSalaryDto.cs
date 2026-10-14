@@ -4,6 +4,7 @@ namespace BMS.Application.Dtos;
 
 public class ViewSalaryDto
 {
+    public int Id{get;set;}
     public int UserId{get;set;}
     public decimal Amount{get;set;}
     public int Duration{get;set;}

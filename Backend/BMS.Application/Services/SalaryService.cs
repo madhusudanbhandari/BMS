@@ -1,6 +1,7 @@
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
+using BMS.Domain.Entities.Enums;
 
 namespace BMS.Application.Service;
 
@@ -37,6 +38,7 @@ public class SalaryService : ISalaryService
 
         return new ViewSalaryDto
         {
+            Id=salary.Id,
             UserId=userId,
             Amount=salary.Amount,
             Duration=salary.Duration,
@@ -85,23 +87,24 @@ public class SalaryService : ISalaryService
             throw new Exception("You cannot control this salary");
         }
 
-        if (salary.SalaryStatus != Domain.Entities.Enums.SalaryStatus.Pending)
+        if (salary.SalaryStatus != SalaryStatus.Pending)
         {
             throw new InvalidOperationException("Only pending salaries can be reviewed");
         }
 
-        if(dto.SalaryStatus!=Domain.Entities.Enums.SalaryStatus.Released && dto.SalaryStatus != Domain.Entities.Enums.SalaryStatus.Rejected)
+        if(dto.SalaryStatus!=SalaryStatus.Released && dto.SalaryStatus != SalaryStatus.Rejected)
         {
             throw new ArgumentException("Hr can only release or reject the salary");
         }
 
         salary.SalaryStatus=dto.SalaryStatus;
-        salary.ReleasedAt=dto.SalaryStatus==Domain.Entities.Enums.SalaryStatus.Released ? DateTime.UtcNow: null;
+        salary.ReleasedAt=dto.SalaryStatus==SalaryStatus.Released ? DateTime.UtcNow: null;
 
         await _salaryRepository.SaveChangesAsync();
 
         return new ViewSalaryDto
         {
+            Id=salary.Id,
             UserId=salary.UserId,
             Amount=salary.Amount,
             Duration=salary.Duration,
@@ -114,4 +117,86 @@ public class SalaryService : ISalaryService
 
 
     }
+
+    public async Task<PagedResponseDto> ViewAllSalaryRequests(int hrId,int page,int PageSize,SalaryStatus? salaryStatus)
+    {
+        if (page < 1)
+        {
+            throw new Exception("page cannot be less then 1");
+        }
+
+        if(PageSize<1 || PageSize > 100)
+        {
+            throw new Exception("Page must be between 1 and 100");
+        }
+
+        var hr=await _authRepository.GetUserByIdAsync(hrId);
+        if (hr == null)
+        {
+            throw new Exception("Cannot find the hr");
+        }
+        var hrOrg=hr.OrganizationId;
+
+        var (items,totalCount)=await _salaryRepository.GetAllSalariesByOrgId(hrOrg,page,PageSize,salaryStatus);
+
+        return new PagedResponseDto
+        {
+            PageNo=page,
+            PageSize=PageSize,
+            TotalCount=totalCount,
+            TotalPage=(int) Math.Ceiling(totalCount/(double) PageSize),
+
+            Items=items.Select(salary=>new ViewSalaryDto
+            {
+                Id=salary.Id,
+                UserId=salary.UserId,
+                Amount=salary.Amount,
+                Duration=salary.Duration,
+                SalaryStatus=salary.SalaryStatus,
+                RequestedAt=salary.RequestedAt,
+                AccountName=salary.AccountName,
+                AccountNumber=salary.AccountNumber,
+                ReleasedAt=salary.ReleasedAt
+            }).ToList()
+        };
+    }
+
+    public async Task<PagedResponseDto> ViewAllMySalaries(int empId,int page,int pageSize,SalaryStatus? salaryStatus)
+        {
+
+        if (page < 1)
+        {
+            throw new Exception("Page cannot be less than 1");
+        }
+
+        if(pageSize<1 || pageSize > 100)
+        {
+            throw new Exception("Page size must be between 1 and 100");
+        }
+
+
+        var (items,totalCount)=await _salaryRepository.GetAllOfMySalaries(empId,page,pageSize,salaryStatus);
+
+        return new PagedResponseDto
+        {
+            PageNo=page,
+            PageSize=pageSize,
+            TotalCount=totalCount,
+            TotalPage=(int) Math.Ceiling(totalCount/(double)pageSize),
+
+            Items=items.Select(salary=>new ViewSalaryDto
+            {
+                Id=salary.Id,
+                UserId=salary.UserId,
+                Amount=salary.Amount,
+                Duration=salary.Duration,
+                SalaryStatus=salary.SalaryStatus,
+                RequestedAt=salary.RequestedAt,
+                AccountName=salary.AccountName,
+                AccountNumber=salary.AccountNumber,
+                ReleasedAt=salary.ReleasedAt
+            }).ToList()
+        };
+    }
+
 }
