@@ -21,64 +21,91 @@ export default function Login() {
     });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
-    setLoading(true);
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  setError("");
+  setLoading(true);
 
-    
-    try {
-      const data = await loginUser(formData);
+  try {
+    const data = await loginUser(formData);
 
-      console.log("Login response:", data);
-      console.log("Role:", data.role);
-      console.log("User role:", data.user?.role);
-      console.log("User Role:", data.user?.Role);
+    console.log("Login response:", data);
 
-      const token = data.token ?? data.accessToken;
+    const token = data.token ?? data.accessToken;
 
-      if (!token) {
-        throw new Error("Login succeeded, but the JWT was not found in the response.");
-      }
-
-      localStorage.setItem("token", token);
-
-      const role = data.role ?? data.user?.role ?? data.user?.Role;
-
-      switch (role) {
-        case "PlatformAdmin":
-            navigate("/Padmmin");
-
-        case "OrganizationAdmin":
-          navigate("/admin");
-          break;
-
-        case "Employee":
-          navigate("/employee");
-          break;
-
-        case "Manager":
-          navigate("/manager");
-          break;
-        
-          case "HR":
-            navigate("/hr")
-            break;
-
-        default:
-          throw new Error("Unknown or missing user role.");
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.message ??
-          err.response?.data?.title ??
-          err.message ??
-          "Login failed. Please check your credentials."
+    if (!token) {
+      throw new Error(
+        "Login succeeded, but the JWT was not found in the response."
       );
-    } finally {
-      setLoading(false);
-    }}
+    }
 
+    const user = data.user ?? data;
+
+    const role =
+      data.role ??
+      data.Role ??
+      user.role ??
+      user.Role;
+
+    const organizationId =
+      data.organizationId ??
+      data.OrganizationId ??
+      user.organizationId ??
+      user.OrganizationId ??
+      user.organization?.id ??
+      user.organization?.Id;
+
+    // Save the JWT.
+    localStorage.setItem("token", token);
+
+    // Save user details for the dashboard and other pages.
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        ...user,
+        role,
+        organizationId,
+      })
+    );
+
+    console.log("Logged-in role:", role);
+    console.log("Organization ID:", organizationId);
+
+    switch (role) {
+      case "PlatformAdmin":
+        navigate("/Padmmin");
+        break;
+
+      case "OrganizationAdmin":
+        navigate("/admin");
+        break;
+
+      case "Employee":
+        navigate("/employee");
+        break;
+
+      case "Manager":
+        navigate("/manager");
+        break;
+
+      case "HR":
+        navigate("/hr");
+        break;
+
+      default:
+        throw new Error("Unknown or missing user role.");
+    }
+  } catch (err) {
+    setError(
+      err.response?.data?.message ??
+        err.response?.data?.title ??
+        err.message ??
+        "Login failed. Please check your credentials."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">

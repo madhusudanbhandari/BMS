@@ -21,10 +21,18 @@ error.message ||
 "Something went wrong.";
 
 export default function ProjectManagement() {
-const [projects, setProjects] = useState([]);
-const [organizationId, setOrganizationId] = useState(
-localStorage.getItem("organizationId") || ""
-);
+const [projects, setProjects] = useState([]);const [organizationId, setOrganizationId] = useState(() => {
+  const savedUser = localStorage.getItem("user");
+
+  if (!savedUser) return "";
+
+  try {
+    const user = JSON.parse(savedUser);
+    return String(user.organizationId ?? user.OrganizationId ?? "");
+  } catch {
+    return "";
+  }
+});
 const [form, setForm] = useState(emptyForm);
 const [editingId, setEditingId] = useState(null);
 const [formOpen, setFormOpen] = useState(false);

@@ -11,9 +11,10 @@ import {
 import {
   getTeams,
   getPendingUsers,
-  getProjects,
-  getTasks,
 } from "../../api/adminApi";
+
+import { getAllProjects } from "../../api/projectApi";
+import { getProjectTasks } from "../../api/taskApi";
 
 const cards = [
   {
@@ -64,47 +65,128 @@ export default function AdminOverview() {
       setLoading(true);
       setError("");
 
-      const results = await Promise.allSettled([
-        getTeams(),
-        getPendingUsers(),
-        getProjects(),
-        getTasks(),
-      ]);
+      const failures = [];
 
-      if (!active) return;
+      try {
+        // Read the logged-in user's organization ID.
+        const savedUser = JSON.parse(
+          localStorage.getItem("user") || "{}"
+        );
 
-      const [
-        teamsResult,
-        pendingResult,
-        projectsResult,
-        tasksResult,
-      ] = results;
+        const organizationId = Number(
+          savedUser.organizationId ?? savedUser.OrganizationId
+        );
 
-      const getCount = (result) => {
-        if (
-          result.status === "fulfilled" &&
-          Array.isArray(result.value)
-        ) {
-          return result.value.length;
+        if (!Number.isInteger(organizationId) || organizationId <= 0) {
+          throw new Error("A valid organization ID was not found.");
         }
 
-        return null;
-      };
+        // Load teams, pending users, and projects.
+        const [teamsResult, pendingResult, projectsResult] =
+          await Promise.allSettled([
+            getTeams(),
+            getPendingUsers(),
+            getAllProjects(organizationId),
+          ]);
 
-      setStats({
-        teams: getCount(teamsResult),
-        pending: getCount(pendingResult),
-        projects: getCount(projectsResult),
-        tasks: getCount(tasksResult),
-      });
+        if (!active) return;
 
-      if (results.some((result) => result.status === "rejected")) {
-        setError(
-          "Some dashboard statistics could not be loaded."
-        );
+        const getArray = (result, label) => {
+          if (
+            result.status === "fulfilled" &&
+            Array.isArray(result.value)
+          ) {
+            return result.value;
+          }
+
+          failures.push(label);
+          console.error(
+            `${label} request failed:`,
+            result.status === "rejected"
+              ? result.reason
+              : "Expected an array response."
+          );
+
+          return null;
+        };
+
+        const teams = getArray(teamsResult, "Teams");
+        const pending = getArray(pendingResult, "Pending approvals");
+        const projects = getArray(projectsResult, "Projects");
+
+        let taskCount = null;
+
+        // Fetch tasks for each project, then add their counts.
+        if (projects !== null) {
+          const taskResults = await Promise.allSettled(
+            projects.map((project) => {
+              const projectId = project.id ?? project.Id;
+
+              if (!projectId) {
+                throw new Error("A project is missing its ID.");
+              }
+
+              return getProjectTasks(projectId);
+            })
+          );
+
+          if (!active) return;
+
+          const taskLists = taskResults.map((result) => {
+            if (
+              result.status === "fulfilled" &&
+              Array.isArray(result.value)
+            ) {
+              return result.value;
+            }
+
+            failures.push("Task items");
+
+            if (result.status === "rejected") {
+              console.error("Task items request failed:", result.reason);
+            } else {
+              console.error("Task items API did not return an array.");
+            }
+
+            return null;
+          });
+
+          // Only display a total if every project's task request succeeded.
+          if (taskLists.every((tasks) => tasks !== null)) {
+            taskCount = taskLists.reduce(
+              (total, tasks) => total + tasks.length,
+              0
+            );
+          }
+        } else {
+          failures.push("Task items");
+        }
+
+        setStats({
+          teams: teams?.length ?? null,
+          pending: pending?.length ?? null,
+          projects: projects?.length ?? null,
+          tasks: taskCount,
+        });
+
+        if (failures.length > 0) {
+          setError(
+            `Unable to load: ${[...new Set(failures)].join(", ")}.`
+          );
+        }
+      } catch (err) {
+        console.error("Dashboard statistics error:", err);
+
+        if (active) {
+          setError(
+            err.message || "Unable to load dashboard statistics."
+          );
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
-
-      setLoading(false);
     }
 
     loadOverview();
@@ -116,7 +198,6 @@ export default function AdminOverview() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
-      {/* Welcome section */}
       <section className="overflow-hidden rounded-2xl bg-white shadow-sm">
         <div className="flex flex-col gap-6 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div>
@@ -144,17 +225,15 @@ export default function AdminOverview() {
         </div>
       </section>
 
-      {/* Error message */}
       {error && (
         <div
-          role="status"
+          role="alert"
           className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
-          {error} Check your API connection and try again.
+          {error}
         </div>
       )}
 
-      {/* Statistics cards */}
       <section>
         <div className="mb-5">
           <h2 className="text-xl font-bold text-gray-900">
@@ -211,7 +290,6 @@ export default function AdminOverview() {
         </div>
       </section>
 
-      {/* Quick actions */}
       <section>
         <h2 className="mb-4 text-xl font-bold text-gray-900">
           Quick actions
@@ -256,4 +334,3 @@ export default function AdminOverview() {
     </div>
   );
 }
-
