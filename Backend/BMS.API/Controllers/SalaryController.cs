@@ -52,7 +52,7 @@ public class SalaryController : ControllerBase
 
         [Authorize(Roles = "HR")]
         [HttpGet("view-all-requests")]
-        
+
         public async Task<IActionResult> GetAllSalaryRequests(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
@@ -88,7 +88,9 @@ public class SalaryController : ControllerBase
 
     [Authorize(Roles ="Employee")]
     [HttpGet("get-my-salaries")]
-    public async Task<IActionResult> ViewAllMyRequests()
+    public async Task<IActionResult> ViewAllMyRequests(  [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? status = null)
     {
         var emp=User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -97,7 +99,24 @@ public class SalaryController : ControllerBase
             return Unauthorized();
         }
 
-        var salaries=await _salaryService.ViewAllMySalaries(empId);
+        SalaryStatus? salaryStatus = null;
+
+        if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (!Enum.TryParse<SalaryStatus>(
+                        status, true, out var parsedStatus) ||
+                    !Enum.IsDefined(typeof(SalaryStatus), parsedStatus))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Invalid salary status."
+                    });
+                }
+
+                salaryStatus = parsedStatus;
+            }
+
+        var salaries=await _salaryService.ViewAllMySalaries(empId,page,pageSize,salaryStatus);
         return Ok(salaries);
     }
 
