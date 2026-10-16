@@ -25,7 +25,8 @@ import EmployeeProjects from "./Pages/employee/EmployeeProjects";
 import EmployeeTasks from "./Pages/employee/EmployeeTasks";
 import EmployeeTeams from "./Pages/employee/EmployeeTeams";
 import EmployeeSalary from "./Pages/employee/EmployeeSalary";
-import EmployeePage from "./Pages/employee/EmployeePage";
+
+import HROverview from "./Pages/hr/overview";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -90,6 +91,14 @@ export default function App() {
           <Route path="teams" element={<EmployeeTeams />} />
           <Route path="salary" element={<EmployeeSalary />} />
         </Route>
+                <Route
+          path="/hr"
+          element={
+            <ProtectedRoute allowedRoles={["HR"]}>
+              <HROverview />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback route */}
         <Route
