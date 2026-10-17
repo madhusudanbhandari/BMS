@@ -142,6 +142,8 @@ public class ProjectService : IProjectService
         project.projectStatus=dto.projectStatus;
         project.Description=dto.Description;
 
+        await _projectRepository.SaveChangesAsync();
+
         return new ViewProjectDto
         {
             Id=project.Id,

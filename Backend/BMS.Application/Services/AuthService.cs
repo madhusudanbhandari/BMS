@@ -2,6 +2,8 @@ using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
 using BMS.Domain.Entities.Enums;
+using BMS.Application.Exceptions;
+
 
 namespace BMS.Application.Service;
 
@@ -22,7 +24,7 @@ public class AuthService : IAuthService
         var user=await _authRepository.GetUserByEmailAsync(request.Email);
 
         if(user!=null)
-            throw new Exception("User with that email already exists");
+            throw new NotFoundException("User with that email already exists");
 
         var newUser=new User
         {
@@ -54,7 +56,7 @@ public class AuthService : IAuthService
 
         if (existingUser == null)
         {
-            throw new Exception("Cannot find the user with this email");
+            throw new NotFoundException("Cannot find the user with this email");
         }
 
         var verified=BCrypt.Net.BCrypt.Verify(login.Password,existingUser.Password);
@@ -84,11 +86,11 @@ public class AuthService : IAuthService
 
         if(requested==null || target == null)
         {
-            throw new Exception("User cannot be null");
+            throw new NotFoundException("User cannot be null");
         }
         if (requested.OrganizationId != target.OrganizationId)
         {
-            throw new Exception("users dont belong to the same organization");
+            throw new BadRequestException("users dont belong to the same organization");
         }
 
         bool isSelf=requested.Id==target.Id;

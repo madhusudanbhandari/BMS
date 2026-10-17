@@ -1,6 +1,8 @@
 using BMS.Application.Dtos;
+using BMS.Application.Exceptions;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
+
 
 namespace BMS.Application.Service;
 
@@ -23,17 +25,17 @@ public class TeamService : ITeamService
 
         var admin=await _authRepository.GetUserByIdAsync(adminId);
         
-        var organization=admin?.OrganizationId;
-
-        if (organization != dto.OrganizationId)
+        if(admin==null)
         {
-            throw new Exception("You cannot control team of this organization");
-        }
+            throw new NotFoundException("Admin does not exists");
+        };
 
+        var organization=admin.OrganizationId;
+    
         var team=new Team
         {
             Name=dto.Name,
-            OrganizationId=dto.OrganizationId,
+            OrganizationId=organization,
 
         };
 
@@ -66,7 +68,7 @@ public class TeamService : ITeamService
         
         if (member == null)
         {
-            throw new Exception("User does not exists");
+            throw new NotFoundException("User does not exists");
         }
 
         var orgId=member.OrganizationId;
@@ -103,18 +105,18 @@ public class TeamService : ITeamService
 
         if (team == null)
         {
-            throw new Exception("Team does not exists");
+            throw new NotFoundException("Team does not exists");
         }
 
         var user=await _teamRepository.GetUserAsync(dto.UserId);
 
         if (user == null)
         {
-            throw new Exception("User not found");
+            throw new NotFoundException("User not found");
         }
         if (adminOrganization != team.OrganizationId)
         {
-            throw new Exception("You cannot control team of this organization ");
+            throw new NotFoundException("You cannot control team of this organization ");
         }
 
         if (user.OrganizationId != team.OrganizationId)
@@ -124,7 +126,7 @@ public class TeamService : ITeamService
 
         if (team.Members.Any(m => m.Id == user.Id))
         {
-            throw new Exception("User is already member of this team");
+            throw new BadRequestException("User is already member of this team");
         }
 
         team.Members.Add(user);
@@ -160,14 +162,14 @@ public class TeamService : ITeamService
 
         if (team == null)
         {
-            throw new Exception("Team does not exists");
+            throw new NotFoundException("Team does not exists");
         }
 
         var user=await _teamRepository.GetUserAsync(memberId);
 
         if (user == null)
         {
-            throw new Exception("User  does not exists");
+            throw new NotFoundException("User  does not exists");
         }
 
         if (user.OrganizationId != team.OrganizationId)

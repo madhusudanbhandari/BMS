@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
-using BMS.Domain.Entities;
+using BMS.Application.Exceptions;
 
 namespace BMS.Application.Service;
 
@@ -23,7 +22,7 @@ public class AdminService : IAdminService
         var admin=await _authRepository.GetUserByIdAsync(adminId);
         if (admin == null)
         {
-            throw new Exception("Cannot find the admin");
+            throw new NotFoundException("Cannot find the admin");
         }
         var orgId=admin.OrganizationId;
 
@@ -45,17 +44,17 @@ public class AdminService : IAdminService
     {
         var admin=await _authRepository.GetUserByIdAsync(adminId);
         if(admin==null)
-            throw new Exception("cannot find exception");
+            throw new NotFoundException("cannot find exception");
 
         var orgId=admin.OrganizationId;
         var user=await _adminRepository.GetPendingUserByIdAsync(orgId,dto.UserId);
 
         if(user==null)
-            throw new Exception("User does not exist");
+            throw new NotFoundException("User does not exist");
 
         if (user.OrganizationId != orgId)
         {
-            throw new Exception("you cannot control users of this organization");
+            throw new InvalidOperationException("you cannot control users of this organization");
         }
         
         user.Role=dto.Role;

@@ -33,12 +33,15 @@ public class AdminController : ControllerBase
 
     [Authorize(Roles ="OrganizationAdmin")]
     [HttpPatch("verify-users")]
-    public async Task<IActionResult> VerifyPendingUsersAsync(VerifyUserDto dto)
+    public async Task<IActionResult> VerifyPendingUsersAsync([FromBody]VerifyUserDto dto)
     {
 
         var admin=User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        int.TryParse(admin, out int adminId);
+        if(!int.TryParse(admin, out int adminId))
+        {
+            return Unauthorized();
+        }
 
         var users= await _adminService.VerifyUserRequest(adminId,dto);
 

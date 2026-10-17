@@ -5,11 +5,6 @@ public sealed class NotFoundException : Exception
     public NotFoundException(string message):base(message){}
 }
 
-public sealed class InvalidOperationException : Exception
-{
-    public InvalidOperationException(string message):base(message){}
-}
-
 
 public sealed class ForbiddenException : Exception
 {
