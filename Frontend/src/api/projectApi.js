@@ -33,7 +33,11 @@ export const deleteProject = async (projId) => {
   return response.data;
 };
 
-export const assignTeam = async (data) => {
-  const response = await api.post("/Project/assign-team", data);
+export const assignTeam = async (projectId, teamId) => {
+  const response = await api.post("/Project/assign-team", {
+    projectId: Number(projectId),
+    teamId: Number(teamId),
+  });
+
   return response.data;
 };

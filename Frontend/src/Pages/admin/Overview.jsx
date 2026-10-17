@@ -116,7 +116,6 @@ export default function AdminOverview() {
 
         let taskCount = null;
 
-        // Fetch tasks for each project, then add their counts.
         if (projects !== null) {
           const taskResults = await Promise.allSettled(
             projects.map((project) => {
@@ -151,7 +150,6 @@ export default function AdminOverview() {
             return null;
           });
 
-          // Only display a total if every project's task request succeeded.
           if (taskLists.every((tasks) => tasks !== null)) {
             taskCount = taskLists.reduce(
               (total, tasks) => total + tasks.length,

@@ -6,7 +6,6 @@ import {
   UsersRound,
   FolderKanban,
   CheckCircle2,
-  Settings,
   Building2,
   X,
 } from "lucide-react";
@@ -21,7 +20,6 @@ const navigation = [
   { label: "Team Management", path: "/admin/teams", icon: UsersRound },
   { label: "Projects", path: "/admin/projects", icon: FolderKanban },
   { label: "Tasks", path: "/admin/task-management", icon: Users },
-  { label: "Settings", path: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar({ open, onClose }) {

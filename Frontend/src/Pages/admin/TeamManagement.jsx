@@ -76,26 +76,27 @@ export default function TeamManagement() {
     setTeamName("");
   };
 
-  const handleAddMember = async (teamId) => {
-    const rawValue = memberInputs[teamId]?.trim();
-    const userId = Number(rawValue);
+const handleAddMember = async (teamId) => {
+  const rawValue = memberInputs[teamId]?.trim();
+  const userId = Number(rawValue);
 
-    if (!rawValue || !Number.isInteger(userId) || userId <= 0) {
-      setError("Enter a valid user ID.");
-      return;
-    }
+  if (!rawValue || !Number.isInteger(userId) || userId <= 0) {
+    setError("Enter a valid user ID.");
+    return;
+  }
 
-    await runAction(
-      () =>
-        addTeamMembers({
-          teamId: Number(teamId),
-          userIds: [userId],
-        }),
-      "Member added successfully."
-    );
+  await runAction(
+    () =>
+      addTeamMembers({
+        teamId: Number(teamId),
+        userId: userId,
+      }),
+    "Member added successfully."
+  );
 
-    setMemberInputs((prev) => ({ ...prev, [teamId]: "" }));
-  };
+  setMemberInputs((prev) => ({ ...prev, [teamId]: "" }));
+};
+
 
   const handleRemoveMember = async (teamId, userId) => {
     if (!window.confirm("Remove this member from the team?")) return;
