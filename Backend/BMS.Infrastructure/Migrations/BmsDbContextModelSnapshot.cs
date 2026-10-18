@@ -22,6 +22,49 @@ namespace BMS.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BMS.Domain.Entities.ActivityEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActorUser")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RelatedEntity")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RelatedEntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TargetUser")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId", "CreatedAt");
+
+                    b.HasIndex("TargetUser", "CreatedAt");
+
+                    b.ToTable("ActivityEvents");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Enums.PAdmin", b =>
                 {
                     b.Property<int>("Id")
@@ -55,6 +98,43 @@ namespace BMS.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("PAdmins");
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActivityEventId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityEventId");
+
+                    b.HasIndex("UserId", "CreatedAt", "IsRead");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.Organization", b =>
@@ -273,6 +353,17 @@ namespace BMS.Infrastructure.Migrations
                     b.ToTable("TeamUser", (string)null);
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("BMS.Domain.Entities.ActivityEvent", "ActivityEvent")
+                        .WithMany("Notifications")
+                        .HasForeignKey("ActivityEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActivityEvent");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Project", b =>
                 {
                     b.HasOne("BMS.Domain.Entities.Organization", "Organization")
@@ -353,6 +444,11 @@ namespace BMS.Infrastructure.Migrations
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.ActivityEvent", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.Organization", b =>

@@ -18,6 +18,8 @@ public class BmsDbContext : DbContext
     public DbSet<TaskItem> TaskItems=>Set<TaskItem>();
     public DbSet<PAdmin> PAdmins=>Set<PAdmin>();
     public DbSet<Salary> Salary=>Set<Salary>();
+    public DbSet<Notification> Notifications=>Set<Notification>();
+    public DbSet<ActivityEvent> ActivityEvents=>Set<ActivityEvent>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,6 +71,22 @@ public class BmsDbContext : DbContext
                             j.HasKey("TeamId", "MembersId");
                             j.ToTable("TeamUser");
                         });
+
+        modelBuilder.Entity<ActivityEvent>()
+                    .HasIndex(e=>new{e.OrganizationId,e.CreatedAt});
+        
+        modelBuilder.Entity<ActivityEvent>()
+                    .HasIndex(e=>new{e.TargetUser,e.CreatedAt});
+        
+        modelBuilder.Entity<Notification>()
+                    .HasIndex(e=>new {e.UserId, e.CreatedAt, e.IsRead});
+
+        
+        modelBuilder.Entity<Notification>()
+                    .HasOne(n=>n.ActivityEvent)
+                    .WithMany(e=>e.Notifications)
+                    .HasForeignKey(n=>n.ActivityEventId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                     
 

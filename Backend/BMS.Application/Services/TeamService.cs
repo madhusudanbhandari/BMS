@@ -10,13 +10,17 @@ public class TeamService : ITeamService
 {
     private readonly ITeamRepository _teamRepository;
     private readonly IAuthRepository _authRepository;
+    private readonly IEventNotificationService _eventNotification;
+
     public TeamService(
         ITeamRepository teamRepository,
-        IAuthRepository authRepository
+        IAuthRepository authRepository,
+        IEventNotificationService eventNotification
     )
     {
         _teamRepository=teamRepository;
         _authRepository=authRepository;
+        _eventNotification=eventNotification;
     }
 
     
@@ -130,6 +134,17 @@ public class TeamService : ITeamService
         }
 
         team.Members.Add(user);
+
+        _eventNotification.Record(
+            actorUserId:adminId,
+            targetUserId: user.Id,
+            organizationId:user.OrganizationId,
+            title:"added employee to team",
+            message:$"You have been added to the team{ team.Id}",
+            description:$"{user.FirstName} {user.LastName} added to the team{team.Id}",
+            relatedEntityType:"Team",
+            relatedEntityId:team.Id
+        );
         await _teamRepository.SaveChangesAsync();
 
         var viewTeamDto=new ViewTeamDto
@@ -188,6 +203,18 @@ public class TeamService : ITeamService
         }
 
         team.Members.Remove(user);
+
+        _eventNotification.Record(
+            actorUserId:adminId,
+            targetUserId: user.Id,
+            organizationId:user.OrganizationId,
+            title:"removed employee from team",
+            message:$"You have been removed from the team{ team.Id}",
+            description:$"{user.FirstName} {user.LastName} removed from the team{team.Id}",
+            relatedEntityType:"Team",
+            relatedEntityId:team.Id
+        );
+
         await _teamRepository.SaveChangesAsync();
 
 

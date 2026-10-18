@@ -1,4 +1,5 @@
 using BMS.Application.Dtos;
+using BMS.Application.Exceptions;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
 
@@ -10,13 +11,19 @@ public class TaskItemService : ITaskItemService
     private readonly IAuthRepository _authRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IEventNotificationService _eventNotificationService;
     
-    public TaskItemService(ITaskItemRepository taskItemRepository,IAuthRepository authRepository,ITeamRepository teamRepository,IProjectRepository projectRepository)
+    public TaskItemService(ITaskItemRepository taskItemRepository,
+                            IAuthRepository authRepository,
+                            ITeamRepository teamRepository,
+                            IProjectRepository projectRepository,
+                            IEventNotificationService eventNotificationService)
     {
         _taskItemRepository=taskItemRepository;
         _authRepository=authRepository;
         _teamRepository=teamRepository;
         _projectRepository=projectRepository;
+        _eventNotificationService=eventNotificationService;
     }
 
 
@@ -44,6 +51,29 @@ public class TaskItemService : ITaskItemService
             throw new Exception("You cannot create the taskItem for others project");
         }
 
+        // if(dto.AssignedToUserId is not int assignedUserId)
+        // {
+        //     throw new NotFoundException("cannot find the user");
+        // }
+
+        if (dto.AssignedToUserId == null)
+        {
+            throw new NotFoundException("cannot find user");
+        }
+
+        var assignedUser=await _authRepository.GetUserByIdAsync(dto.AssignedToUserId.Value);
+
+        if (assignedUser == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        var assignedUserOrg=assignedUser.OrganizationId;
+
+        if (assignedUserOrg != projOrg)
+        {
+            throw new BadRequestException("used does not belong to same organization");
+        }
 
        var taskItem=new TaskItem
        {
@@ -56,6 +86,20 @@ public class TaskItemService : ITaskItemService
            AssignedToUserId=dto.AssignedToUserId
 
        } ;
+
+        if (assignedUser != null)
+        {
+            _eventNotificationService.Record(
+                actorUserId:reqId,
+                targetUserId:assignedUser.Id,
+                organizationId:assignedUser.OrganizationId,
+                title:"assigned task",
+                message:$"{assignedUser.Id} assigned a task {taskItem}",
+                description:$"{assignedUser.FirstName} is assigned a task {taskItem.Title}",
+                relatedEntityType:"TaskItem",
+                relatedEntityId:taskItem.Id
+            );
+        }
 
        await _taskItemRepository.AddTaskItem(taskItem);
        await _taskItemRepository.SaveChangesAsync();

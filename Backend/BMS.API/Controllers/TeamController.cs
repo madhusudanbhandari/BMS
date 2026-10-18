@@ -19,7 +19,7 @@ public class TeamController : ControllerBase
     }
 
 
-    [Authorize(Roles ="OrganizationAdmin")]
+    [Authorize(Roles ="OrganizationAdmin,Manager")]
     [HttpPost("create-team")]
     public async Task<IActionResult> CreateTeamAsync(CreateTeamDto dto)
     {
@@ -45,7 +45,7 @@ public class TeamController : ControllerBase
         return Ok(teams);
     }
 
-    [Authorize(Roles ="OrganizationAdmin")]
+    [Authorize(Roles ="OrganizationAdmin,Manager")]
     [HttpPost("add-member")]
     public async Task<IActionResult> AdddMemberAsync(AddMembersToTeamDto dto)
     {
@@ -59,7 +59,7 @@ public class TeamController : ControllerBase
         return Ok(member);
     }
 
-    [Authorize(Roles ="OrganizationAdmin")]
+    [Authorize(Roles ="OrganizationAdmin,Manager")]
     [HttpPost("remove-member")]
     public async Task<IActionResult> RemoveMemberAsync(int teamId, int userId)
     {
@@ -73,9 +73,9 @@ public class TeamController : ControllerBase
         return Ok(removed);
     }
 
-    [Authorize(Roles ="OrganizationAdmin")]
+    [Authorize(Roles ="OrganizationAdmin,Manager")]
     [HttpDelete("delete-team")]
-    public async Task<IActionResult> DeleteMemberAsync(int teamId)
+    public async Task<IActionResult> DeleteTeamAsync(int teamId)
     {
 
         var admin=User.FindFirstValue(ClaimTypes.NameIdentifier);

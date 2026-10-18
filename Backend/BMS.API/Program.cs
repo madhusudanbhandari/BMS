@@ -32,6 +32,8 @@ builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 builder.Services.AddScoped<ITaskItemService, TaskItemService>();
 builder.Services.AddScoped<ISalaryRepository, SalaryRepository>();
 builder.Services.AddScoped<ISalaryService, SalaryService>();
+builder.Services.AddScoped<IEventNotificationService, EventNotificationService>();
+
 
 builder.Services.AddAuthentication(
     JwtBearerDefaults.AuthenticationScheme
@@ -108,7 +110,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseExceptionHandler("/error");
+
 }
+app.UseExceptionHandler("/error");
 
 app.UseHttpsRedirection();
 
