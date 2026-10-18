@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import api from "../../api/axios";
+import NotificationBell from "../../components/NotificationBell";
 
 const getItems = (data) => {
   if (Array.isArray(data)) return data;
@@ -222,13 +223,19 @@ const EmployeeOverview = () => {
             </p>
           </div>
 
-          <button
-            onClick={loadDashboard}
-            className="inline-flex items-center justify-center gap-2 self-start rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </button>
+        <div className="flex items-center gap-3 self-start">
+            <NotificationBell />
+
+            <button
+              onClick={loadDashboard}
+              className="inline-flex items-center justify-center gap-2 rounded-lg
+                border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium
+                text-gray-700 shadow-sm transition hover:bg-gray-50"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Error message */}
