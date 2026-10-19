@@ -17,6 +17,27 @@ params: { projId },
 return response.data;
 };
 
+export const getEmployeeTasks = async (empId) => {
+const response = await api.get("/TaskItem/employee-taskItems", {
+params: { empId },
+});
+return response.data;
+}
+
+export const updateTaskStatus = async (taskItemId, status) => {
+  const response = await api.patch(
+    "/TaskItem/update-taskItemStatus",
+    { status: Number(status) },
+    {
+      params: { id: taskItemId },
+    }
+  );
+
+  return response.data;
+};
+
+
+
 export const updateTask = async (id, data) => {
 const response = await api.patch("/TaskItem/update-taskItem", data, {
 params: { id },
@@ -30,3 +51,4 @@ params: { id },
 });
 return response.data;
 };
+
