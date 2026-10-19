@@ -11,11 +11,13 @@ public class AuthService : IAuthService
 {
     private readonly IAuthRepository _authRepository;
     private readonly ITokenService _tokenService;
+    private readonly IEventNotificationService _eventNotificationService;
 
-    public AuthService(IAuthRepository authRepository,ITokenService tokenService)
+    public AuthService(IAuthRepository authRepository,ITokenService tokenService,IEventNotificationService eventNotificationService)
     {
         _authRepository=authRepository;
         _tokenService=tokenService;
+        _eventNotificationService=eventNotificationService;
 
     }
 
@@ -36,7 +38,26 @@ public class AuthService : IAuthService
             Status=UserStatus.Pending
         };
 
+        var orgAdmin=await _authRepository.GetOrgAdminAsync(request.OrganizationId);
+
+        if (orgAdmin == null)
+        {
+            throw new NotFoundException("Cannot find the admin for this organization");
+        }
+
         await _authRepository.AddUserAsync(newUser);
+
+        _eventNotificationService.Record(
+            actorUserId:newUser.Id,
+            targetUserId: orgAdmin.Id,
+            organizationId:newUser.OrganizationId,
+            title:"New User Request",
+            message:$"User watiting for verification {newUser.Id}",
+            description:$"{newUser.FirstName} {newUser.LastName} waiting for verification",
+            relatedEntityType:"User",
+            relatedEntityId:newUser.Id
+        );
+
         await _authRepository.SaveChangesAsync();
 
         return new UserResponse

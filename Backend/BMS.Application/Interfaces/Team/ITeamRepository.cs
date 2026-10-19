@@ -4,7 +4,8 @@ namespace BMS.Application.Interface;
 
 public interface ITeamRepository
 {
-    public Task<List<Team>> ViewTeamsAsync(int orgId);
+    public Task<List<Team>> ViewOrgTeamsAsync(int orgId);
+    public Task<List<Team>> ViewEmpTeamsAsync(int empd);
     public Task<Team?>GetTeamAsync(int teamId);
 
     public Task<User?> GetUserAsync(int userId);

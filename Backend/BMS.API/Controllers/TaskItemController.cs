@@ -19,7 +19,7 @@ public class TaskItemController : ControllerBase
         _taskItemService=taskItemService;
     }
 
-    [Authorize(Roles ="Manager")]
+    [Authorize(Roles ="Manager,OrganizationAdmin")]
     [HttpPost("create-taskItem")]
     public async Task<IActionResult> CreateTaskItemAsync(CreateTaskItemDto dto)
     {

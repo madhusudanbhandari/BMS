@@ -8,10 +8,12 @@ public class AdminService : IAdminService
 {
     private readonly IAdminRepository _adminRepository;
     private readonly IAuthRepository _authRepository;
-    public AdminService(IAdminRepository adminRepository,IAuthRepository authRepository)
+    private readonly IEventNotificationService _eventNotificationService;
+    public AdminService(IAdminRepository adminRepository,IAuthRepository authRepository,IEventNotificationService eventNotificationService)
     {
         _adminRepository=adminRepository;
         _authRepository=authRepository;
+        _eventNotificationService=eventNotificationService;
     }
 
     public async Task<List<ViewPendingUser>> ViewAllPendingUsersAsync(int adminId)
@@ -59,6 +61,17 @@ public class AdminService : IAdminService
         
         user.Role=dto.Role;
         user.Status=dto.Status;
+
+        _eventNotificationService.Record(
+            actorUserId:adminId,
+            targetUserId: user.Id,
+            organizationId:user.OrganizationId,
+            title:"User Verified",
+            message:$"User  verified {user.Id}",
+            description:$"{user.FirstName} {user.LastName} waiting for verification",
+            relatedEntityType:"User",
+            relatedEntityId:user.Id
+        );
 
         await _authRepository.SaveChangesAsync();
 

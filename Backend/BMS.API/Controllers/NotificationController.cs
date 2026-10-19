@@ -17,7 +17,7 @@ public class NotificationController : ControllerBase
         _eventNotificationService=eventNotificationService;
     }
 
-    [HttpGet("view-notification")]
+    [HttpGet]
     public async Task<ActionResult<List<ViewNotificationDto>>> ViewMyNotifications()
     {
         var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -42,8 +42,8 @@ public class NotificationController : ControllerBase
 
     }
 
-    [HttpPatch("mark-as-read")]
-    public async Task<IActionResult> MarkAsReadAsync(int notId)
+    [HttpPatch("{id:int}/read")]
+    public async Task<IActionResult> MarkAsReadAsync(int id)
     {
         var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -52,7 +52,7 @@ public class NotificationController : ControllerBase
             return Unauthorized();
         }
 
-        var updated=await _eventNotificationService.MarkAsReadAsync(userId,notId);
+        var updated=await _eventNotificationService.MarkAsReadAsync(userId,id);
 
         if (!updated)
         {

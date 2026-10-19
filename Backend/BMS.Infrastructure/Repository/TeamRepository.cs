@@ -22,11 +22,18 @@ public class TeamRepository : ITeamRepository
         
     }
 
-    public async Task<List<Team>> ViewTeamsAsync(int orgId)
+    public async Task<List<Team>> ViewOrgTeamsAsync(int orgId)
     {
         return await _context.Teams
                                 .Where(t=>t.OrganizationId==orgId)
                                 .Include(t=>t.Members)
+                                .ToListAsync();
+    }
+
+    public async Task<List<Team>> ViewEmpTeamsAsync(int empId)
+    {
+        return await _context.Teams
+                                .Where(t=>t.Members.Any(m=>m.Id==empId))
                                 .ToListAsync();
     }
 

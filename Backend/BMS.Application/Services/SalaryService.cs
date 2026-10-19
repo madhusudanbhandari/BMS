@@ -9,10 +9,12 @@ public class SalaryService : ISalaryService
 {
     private readonly ISalaryRepository _salaryRepository; 
     private readonly IAuthRepository _authRepository ;   
-    public SalaryService(ISalaryRepository salaryRepository,IAuthRepository authRepository)
+    private readonly IEventNotificationService _eventNotificationService;
+    public SalaryService(ISalaryRepository salaryRepository,IAuthRepository authRepository,IEventNotificationService eventNotificationService)
     {
         _salaryRepository=salaryRepository;
         _authRepository=authRepository;
+        _eventNotificationService=eventNotificationService;
     }
 
     public async Task<ViewSalaryDto> RequestSalaryAsync(int userId,RequestSalaryDto dto)
@@ -34,6 +36,9 @@ public class SalaryService : ISalaryService
         };
 
         await _salaryRepository.AddSalary(salary);
+    
+    
+
         await _salaryRepository.SaveChangesAsync();
 
         return new ViewSalaryDto

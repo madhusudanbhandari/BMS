@@ -44,6 +44,19 @@ public class TeamController : ControllerBase
 
         return Ok(teams);
     }
+    
+    [Authorize(Roles ="Employee")]
+    [HttpGet("view-my-teams")]
+    public async Task<IActionResult> ViewMyTeamsAsync()
+    {
+        var member=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        int.TryParse(member,out int memberId);
+
+        var teams=await _teamService.ViewMyTeamsAsync(memberId);
+
+        return Ok(teams);
+    }
 
     [Authorize(Roles ="OrganizationAdmin,Manager")]
     [HttpPost("add-member")]

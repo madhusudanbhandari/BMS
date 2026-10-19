@@ -78,7 +78,7 @@ public class TeamService : ITeamService
         var orgId=member.OrganizationId;
 
 
-        var teams=await _teamRepository.ViewTeamsAsync(orgId);
+        var teams=await _teamRepository.ViewOrgTeamsAsync(orgId);
 
         return teams.Select(team=>new ViewTeamDto
         {
@@ -97,6 +97,29 @@ public class TeamService : ITeamService
             }).ToList()
         }).ToList();
     }
+
+    public async Task<List<ViewTeamDto>> ViewMyTeamsAsync(int memberId)
+    {
+        var teams=await _teamRepository.ViewEmpTeamsAsync(memberId);
+
+        return teams.Select(team=>new ViewTeamDto
+        {
+            Id=team.Id,
+            Name=team.Name,
+            OrganizationId=team.OrganizationId,
+
+            Members=team.Members.Select(user=>new TeamMemberDto
+            {
+                Id=user.Id,
+                FirstName=user.FirstName,
+                LastName=user.LastName,
+                Email=user.Email,
+                organizationId=user.OrganizationId,
+                Role=user.Role
+            }).ToList()
+        }).ToList();
+    }
+
 
     public async Task<ViewTeamDto> AddMembersToTeamAsync(int adminId,AddMembersToTeamDto dto)
     {
