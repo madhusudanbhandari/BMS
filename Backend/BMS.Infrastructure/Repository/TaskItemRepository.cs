@@ -28,6 +28,11 @@ public class TaskItemRepository : ITaskItemRepository
                                     .ToListAsync();
     }
 
+    public async Task<List<TaskItem>> GetEmployeeTaskItemsAsync(int empId)
+    {
+        return await _context.TaskItems.Where(t=>t.AssignedToUserId==empId).ToListAsync();
+    }
+
     public async Task AddTaskItem(TaskItem taskItem)
     {
         await _context.TaskItems.AddAsync(taskItem);

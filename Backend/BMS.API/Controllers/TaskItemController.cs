@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
-using BMS.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +30,7 @@ public class TaskItemController : ControllerBase
 
     }
     
-    
+    [Authorize(Roles ="Manager,OrganizationAdmin")]
     [HttpPatch("update-taskItem")]
     public async Task<IActionResult> UpdateTaskItemAsync(int id, UpdateTaskItemDto dto)
     {
@@ -41,6 +40,37 @@ public class TaskItemController : ControllerBase
         var taskItem=await _taskItemService.UpdateTaskItemAsync(reqid,id, dto);
 
         return Ok(taskItem);
+    }
+
+    [Authorize(Roles ="Manager,OrganizationAdmin,Employee")]
+    [HttpPatch("update-taskItemStatus")]
+    public async Task<IActionResult> UpdateTaskItemStatusAsync(int id, UpdateStatusDto dto)
+    {
+        var requester=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(!int.TryParse(requester,out int reqid))
+        {
+            return Unauthorized();
+        }
+
+        var taskItem=await _taskItemService.UpdateTaskItemStatus(reqid,id, dto);
+
+        return Ok(taskItem);
+    }
+
+    [Authorize(Roles ="Employee")]
+    [HttpGet("employee-taskItems")]
+    public async Task<IActionResult> ViewEmployeeTaskItems()
+    {
+        var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if(!int.TryParse(user,out int userId))
+        {
+            return Unauthorized();
+        }
+
+        var taskItems=await _taskItemService.ViewEmployeeTaskItems(userId);
+        
+        return Ok(taskItems);
     }
 
     [HttpGet("taskItem/{id}")]

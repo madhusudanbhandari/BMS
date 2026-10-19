@@ -9,6 +9,7 @@ public interface ITaskItemRepository
 
     public Task<List<TaskItem>> GetTaskItemsAsync(int projId);
 
+    public Task<List<TaskItem>> GetEmployeeTaskItemsAsync(int empId);
     public Task AddTaskItem(TaskItem taskItem);
     public Task RemoveTaskItem(TaskItem taskItem);
     public Task SaveChangesAsync();

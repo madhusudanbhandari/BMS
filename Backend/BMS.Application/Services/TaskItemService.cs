@@ -131,6 +131,7 @@ public class TaskItemService : ITaskItemService
         var orgId=project.OrganizationId;
 
         var user=await _authRepository.GetUserByIdAsync(requesterId);
+
         if (user == null)
         {
             throw new Exception("cannot find the user");
@@ -139,7 +140,7 @@ public class TaskItemService : ITaskItemService
 
         if (orgId != userOrg)
         {
-            throw new InvalidOperationException("You cant control this item");
+            throw new InvalidOperationException("You cant change this item");
         }
         
         var newProject=await _projectRepository.GetProjectByIdAsync(dto.ProjectId);
@@ -148,7 +149,6 @@ public class TaskItemService : ITaskItemService
         {
             throw new UnauthorizedAccessException("You cannot control this taskItem");
         }
-
         taskItem.Title=dto.Title;
         taskItem.Description=dto.Description;
         taskItem.Status=dto.Status;
@@ -170,6 +170,71 @@ public class TaskItemService : ITaskItemService
            ProjectId=taskItem.ProjectId,
            AssignedToUserId=taskItem.AssignedToUserId
        };
+    }
+
+    public async Task<ViewTaskItemDto> UpdateTaskItemStatus(int reqId, int taskItemId,UpdateStatusDto dto)
+    {
+        var user=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (user == null)
+        {
+            throw new NotFoundException("User not found");
+        }
+
+        var taskItem=await _taskItemRepository.GetTaskItemByIdAsync(taskItemId);
+
+        if (taskItem == null)
+        {
+            throw new NotFoundException("Cannot find the task Item");
+        }
+
+        if (taskItem.AssignedToUserId != reqId)
+        {
+            throw new BadRequestException(
+                "You can only update tasks assigned to you.");
+        }
+
+        taskItem.Status=dto.Status;
+
+        await _taskItemRepository.SaveChangesAsync();
+
+        return new ViewTaskItemDto
+        {
+            Id=taskItem.Id,
+            Title=taskItem.Title,
+            Description=taskItem.Description,
+            Status=taskItem.Status,
+            Priority=taskItem.Priority,
+            DueDate=taskItem.DueDate,
+            ProjectId=taskItem.ProjectId,
+            AssignedToUserId=taskItem.AssignedToUserId
+        };
+
+
+    }
+
+    public async Task<List<ViewTaskItemDto>> ViewEmployeeTaskItems(int empId)
+    {
+        var user=await _authRepository.GetUserByIdAsync(empId);
+        if (user == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+        var taskItem=await _taskItemRepository.GetEmployeeTaskItemsAsync(empId);
+
+        return taskItem.Select(taskItem=>new ViewTaskItemDto
+        {
+            Id=taskItem.Id,
+            Title=taskItem.Title,
+            Description=taskItem.Description,
+            Status=taskItem.Status,
+            Priority=taskItem.Priority,
+            DueDate=taskItem.DueDate,
+            ProjectId=taskItem.ProjectId,
+            AssignedToUserId=taskItem.AssignedToUserId
+        }).ToList();
+
     }
 
     public async Task<ViewTaskItemDto?> ViewTaskItemAsync(int requesterId,int taskId)
