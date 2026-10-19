@@ -13,7 +13,7 @@ export default function EmployeeTeams() {
     setError("");
 
     try {
-      const response = await api.get("/Team/view-teams");
+      const response = await api.get("/Team/view-my-teams");
       const data = response.data;
       setTeams(Array.isArray(data) ? data : data?.items ?? []);
     } catch (err) {

@@ -78,7 +78,7 @@ const EmployeeOverview = () => {
 
       const [teamResponse, projectResponse, salaryResponse] =
         await Promise.all([
-          api.get("/Team/view-teams"),
+          api.get("/Team/view-my-teams"),
           api.get("/Project/view-all-projects", {
             params: { orgId: organizationId },
           }),
