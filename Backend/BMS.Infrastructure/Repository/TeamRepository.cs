@@ -34,6 +34,9 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
                                 .Where(t=>t.Members.Any(m=>m.Id==empId))
+                                .Include(t=>t.Members)
+                                .Include(t=>t.Organization)
+                                .Include(t=>t.Projects)
                                 .ToListAsync();
     }
 

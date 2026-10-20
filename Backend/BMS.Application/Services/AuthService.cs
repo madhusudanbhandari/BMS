@@ -100,6 +100,31 @@ public class AuthService : IAuthService
 
     }
 
+    public async Task<List<UserResponse>> ViewOrganizationEmployees(int reqId)
+    {
+        var requester=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (requester == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        var reqOrg=requester.OrganizationId;
+
+        var orgEmployees=await _authRepository.GetOrgEmployees(reqOrg);
+
+        return orgEmployees.Select(user=>new UserResponse
+        {
+           Id=user.Id,
+            FirstName=user.FirstName,
+            LastName=user.LastName,
+            Email=user.Email,
+            Role=user.Role.ToString(),
+            OrganizationId=user.OrganizationId,
+ 
+        }).ToList();
+    }
+
     public async Task<UserResponse> UpdateUserAsync(string requestedUserEmail,string targetUserEmail, UpdateUserDto dto)
     {
         var requested=await _authRepository.GetUserByEmailAsync(requestedUserEmail);

@@ -30,6 +30,12 @@ public class AuthRepository : IAuthRepository
         return await _context.Users.FirstOrDefaultAsync(u=>u.OrganizationId==orgId && u.Role==Domain.Entities.Enums.UserRoles.OrganizationAdmin);
         
     }
+
+    public async Task<List<User>> GetOrgEmployees(int orgId)
+    {
+        return await _context.Users.Where(u=>u.OrganizationId==orgId).ToListAsync();
+    }
+    
     public async Task AddUserAsync(User user)
     {
         await _context.Users.AddAsync(user);

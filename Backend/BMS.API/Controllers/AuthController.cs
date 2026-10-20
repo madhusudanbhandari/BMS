@@ -49,6 +49,22 @@ public class AuthController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize(Roles ="OrganizationAdmin, HR, Manager")]
+    [HttpGet("organization-employees")]
+    public async Task<IActionResult> ViewOrgEmployees()
+    {
+        var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if(!int.TryParse(user, out int userId))
+        {
+            return Unauthorized();
+        }
+
+        var employees=await _authService.ViewOrganizationEmployees(userId);
+
+        return Ok(employees);
+    }
+
     [Authorize]
     [HttpDelete("delete-user")]
     public async Task<IActionResult> DeleteUserAsync(string targetUserEmail)

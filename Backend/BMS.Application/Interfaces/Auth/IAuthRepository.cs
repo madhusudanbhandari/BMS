@@ -6,6 +6,7 @@ public interface IAuthRepository
 {
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetUserByIdAsync(int id);
+    Task<List<User>> GetOrgEmployees(int orgId);
     Task<User?> GetOrgAdminAsync(int orgId);
     Task AddUserAsync(User user);
 

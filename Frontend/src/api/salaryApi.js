@@ -6,14 +6,12 @@ export const getSalaryRequests = async ({
   pageSize = 10,
   status,
 } = {}) => {
-  const params = { page, pageSize };
-
-  if (status) {
-    params.status = status;
-  }
-
   const response = await api.get("/Salary/view-all-requests", {
-    params,
+    params: {
+      page,
+      pageSize,
+      ...(status ? { status } : {}),
+    },
   });
 
   return response.data;
