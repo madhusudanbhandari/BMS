@@ -13,10 +13,33 @@ import {
   Save,
   UserRound,
   AlertCircle,
+  LogOut,
 } from "lucide-react";
 import api from "../../api/axios";
 
 const PAGE_SIZE = 10;
+
+// Keep these values synchronized with BMS.Domain.Entities.Enums.SalaryStatus.
+const SALARY_STATUS = {
+  Pending: 1,
+  Reviewed: 2,
+  Released: 3,
+  Rejected: 4,
+};
+
+const USER_STATUS = {
+  1: "Pending",
+  2: "Reviewed",
+  3: "Rejected",
+};
+
+const USER_ROLES = {
+  1: "Organization Admin",
+  2: "Platform Admin",
+  3: "Employee",
+  4: "Manager",
+  5: "HR",
+};
 
 const unwrap = (response) => response?.data ?? response;
 
@@ -24,6 +47,7 @@ const getRequests = (response) => {
   const data = unwrap(response);
 
   if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
 
   const items =
     data?.items ??
@@ -45,63 +69,149 @@ const getTotal = (response, items) => {
     data?.totalItems ??
     data?.TotalItems ??
     data?.totalRecords ??
-    data?.TotalRecords;
+    data?.TotalRecords ??
+    data?.data?.totalCount ??
+    data?.data?.TotalCount;
 
-  return Number.isFinite(Number(value)) && value != null
+  return value != null && Number.isFinite(Number(value))
     ? Number(value)
     : items.length;
 };
 
-const getStatus = (request) =>
-  String(
-    request.salaryStatus ??
-      request.SalaryStatus ??
-      request.status ??
-      request.Status ??
-      "Unknown"
-  );
-
-const getRequestId = (request) => request.id ?? request.Id;
+const getRequestId = (request) => request?.id ?? request?.Id;
 
 const getEmployeeId = (request) =>
-  request.userId ??
-  request.UserId ??
-  request.employeeId ??
-  request.EmployeeId;
+  request?.userId ??
+  request?.UserId ??
+  request?.employeeId ??
+  request?.EmployeeId;
 
-const getAmount = (request) =>
-  request.amount ?? request.Amount;
+const getAmount = (request) => request?.amount ?? request?.Amount;
 
-const getErrorMessage = (err) =>
-  err.response?.data?.message ??
-  err.response?.data?.title ??
-  err.message ??
-  "Something went wrong.";
+const getErrorMessage = (err) => {
+  const data = err?.response?.data;
+
+  if (data?.message) return data.message;
+  if (data?.title) return data.title;
+
+  if (data?.errors) {
+    return Object.values(data.errors).flat().join(" ");
+  }
+
+  return err?.message ?? "Something went wrong.";
+};
+
+const normalizeStatus = (value, numericStatuses) => {
+  if (value == null || value === "") return "Unknown";
+
+  const normalized = String(value).trim();
+
+  if (/^\d+$/.test(normalized)) {
+    return numericStatuses[Number(normalized)] ?? "Unknown";
+  }
+
+  const match = Object.keys(numericStatuses).find(
+    (status) => status.toLowerCase() === normalized.toLowerCase()
+  );
+
+  return match ?? normalized;
+};
+
+const getSalaryStatus = (request) =>
+  normalizeStatus(
+    request?.salaryStatus ??
+      request?.SalaryStatus ??
+      request?.status ??
+      request?.Status,
+    {
+      1: "Pending",
+      2: "Reviewed",
+      3: "Released",
+      4: "Rejected",
+    }
+  );
+
+const getEmployeeStatus = (employee) =>
+  normalizeStatus(
+    employee?.status ?? employee?.Status,
+    {
+      1: "Pending",
+      2: "Reviewed",
+      3: "Rejected",
+    }
+  );
+
+const getEmployeeRole = (employee) =>
+  normalizeStatus(
+    employee?.role ?? employee?.Role,
+    USER_ROLES
+  );
+
+const getEmployeeName = (employee) =>
+  (employee?.fullName ??
+  employee?.FullName ??
+  employee?.name ??
+  employee?.Name ??
+  [
+    employee?.firstName ?? employee?.FirstName,
+    employee?.lastName ?? employee?.LastName,
+  ]
+    .filter(Boolean)
+    .join(" ")) ||
+  "—";
 
 const formatMoney = (amount) => {
   if (amount == null || amount === "") return "—";
+
+  const numericAmount = Number(amount);
+
+  if (!Number.isFinite(numericAmount)) return "—";
 
   return new Intl.NumberFormat("en-NP", {
     style: "currency",
     currency: "NPR",
     maximumFractionDigits: 2,
-  }).format(Number(amount));
+  }).format(numericAmount);
+};
+
+const formatDate = (value) => {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : date.toLocaleDateString();
 };
 
 const getStatusStyle = (status) => {
   switch (String(status).toLowerCase()) {
     case "pending":
       return "bg-amber-50 text-amber-700";
-    case "approved":
+
+    case "Reviewed":
       return "bg-emerald-50 text-emerald-700";
+
     case "rejected":
       return "bg-red-50 text-red-700";
+
     case "released":
       return "bg-indigo-50 text-indigo-700";
+
     default:
       return "bg-gray-100 text-gray-700";
   }
 };
+
+const StatusBadge = ({ status }) => (
+  <span
+    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${getStatusStyle(
+      status
+    )}`}
+  >
+    {status}
+  </span>
+);
 
 const statCards = [
   {
@@ -128,7 +238,7 @@ const statCards = [
   {
     title: "Processed Requests",
     key: "processed",
-    description: "Approved, rejected or released",
+    description: "Reviewed, rejected or released",
     icon: CheckCircle2,
     color: "bg-emerald-50 text-emerald-600",
   },
@@ -157,7 +267,7 @@ export default function HROverview() {
   const [employeeError, setEmployeeError] = useState("");
 
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [newStatus, setNewStatus] = useState("Approved");
+  const [newStatus, setNewStatus] = useState("Reviewed");
   const [rejectionReason, setRejectionReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -168,18 +278,16 @@ export default function HROverview() {
     setError("");
 
     try {
-      const params = {
-        page,
-        pageSize: PAGE_SIZE,
-        ...(statusFilter ? { status: statusFilter } : {}),
-      };
-
-      const response = await api.get(
-        "/Salary/view-all-requests",
-        { params }
-      );
+      const response = await api.get("/Salary/view-all-requests", {
+        params: {
+          page,
+          pageSize: PAGE_SIZE,
+          ...(statusFilter ? { status: statusFilter } : {}),
+        },
+      });
 
       const items = getRequests(response);
+
       setRequests(items);
       setTotal(getTotal(response, items));
     } catch (err) {
@@ -192,13 +300,13 @@ export default function HROverview() {
 
   const loadSummary = useCallback(async () => {
     try {
-      const [pendingResponse, approvedResponse, rejectedResponse, releasedResponse] =
+      const [pendingResponse, ReviewedResponse, rejectedResponse, releasedResponse] =
         await Promise.all([
           api.get("/Salary/view-all-requests", {
             params: { page: 1, pageSize: 1, status: "Pending" },
           }),
           api.get("/Salary/view-all-requests", {
-            params: { page: 1, pageSize: 1, status: "Approved" },
+            params: { page: 1, pageSize: 1, status: "Reviewed" },
           }),
           api.get("/Salary/view-all-requests", {
             params: { page: 1, pageSize: 1, status: "Rejected" },
@@ -208,15 +316,17 @@ export default function HROverview() {
           }),
         ]);
 
-      setPendingTotal(getTotal(pendingResponse, getRequests(pendingResponse)));
+      setPendingTotal(
+        getTotal(pendingResponse, getRequests(pendingResponse))
+      );
 
       setProcessedTotal(
-        getTotal(approvedResponse, getRequests(approvedResponse)) +
+        getTotal(ReviewedResponse, getRequests(ReviewedResponse)) +
           getTotal(rejectedResponse, getRequests(rejectedResponse)) +
           getTotal(releasedResponse, getRequests(releasedResponse))
       );
     } catch (err) {
-      console.warn("Unable to load complete salary summary:", err);
+      console.warn("Unable to load salary summary:", err);
     }
   }, []);
 
@@ -225,28 +335,24 @@ export default function HROverview() {
     setEmployeeError("");
 
     try {
-      const response = await api.get(
-        "/Auth/organization-employees",
-        {
-          params: {
-            page: employeePage,
-            pageSize: PAGE_SIZE,
-            ...(employeeSearch.trim()
-              ? { search: employeeSearch.trim() }
-              : {}),
-          },
-        }
-      );
+      // This endpoint must exist in your AuthController.
+      const response = await api.get("/Auth/organization-employees", {
+        params: {
+          page: employeePage,
+          pageSize: PAGE_SIZE,
+          ...(employeeSearch.trim()
+            ? { search: employeeSearch.trim() }
+            : {}),
+        },
+      });
 
       const items = getRequests(response);
+
       setEmployees(items);
       setEmployeeTotal(getTotal(response, items));
     } catch (err) {
-      console.error("Unable to load organization employees:", err);
-      setEmployeeError(
-        getErrorMessage(err) +
-          " The organization employee endpoint may not be implemented yet."
-      );
+      console.error("Unable to load employees:", err);
+      setEmployeeError(getErrorMessage(err));
     } finally {
       setEmployeesLoading(false);
     }
@@ -266,33 +372,74 @@ export default function HROverview() {
     }
   }, [tab, loadEmployees]);
 
+  const refreshAll = async () => {
+    setNotice("");
+
+    await Promise.all([loadRequests(), loadSummary()]);
+
+    if (tab === "employees") {
+      await loadEmployees();
+    }
+  };
+
+  const logout = () => {
+    // Keep this list synchronized with the keys used by your auth flow.
+    [
+      "token",
+      "user",
+      "role",
+      "organizationId",
+      "authToken",
+    ].forEach((key) => localStorage.removeItem(key));
+
+    window.location.assign("/login");
+  };
+
   const openReview = (request) => {
+    const status = getSalaryStatus(request);
+
     setSelectedRequest(request);
-    setNewStatus(getStatus(request));
+    setNewStatus(
+      Object.prototype.hasOwnProperty.call(SALARY_STATUS, status)
+        ? status
+        : "Reviewed"
+    );
     setRejectionReason(
-      request.rejectionReason ?? request.RejectionReason ?? ""
+      request?.rejectionReason ?? request?.RejectionReason ?? ""
     );
     setActionError("");
+    setNotice("");
   };
 
   const saveReview = async (event) => {
     event.preventDefault();
 
-    if (!selectedRequest) return;
+    if (!selectedRequest || saving) return;
 
     const salaryId = getRequestId(selectedRequest);
     const employeeId = getEmployeeId(selectedRequest);
 
     if (salaryId == null || employeeId == null) {
-      setActionError("The request is missing its salary ID or employee ID.");
+      setActionError(
+        "The request is missing its salary ID or employee ID."
+      );
+      return;
+    }
+
+    const statusValue = SALARY_STATUS[newStatus];
+
+    if (statusValue == null) {
+      setActionError("Please select a valid salary status.");
       return;
     }
 
     if (
-      newStatus.toLowerCase() === "rejected" &&
+      newStatus === "Rejected" &&
       !rejectionReason.trim()
     ) {
-      setActionError("Please provide a reason for rejecting this request.");
+      setActionError(
+        "Please provide a reason for rejecting this request."
+      );
       return;
     }
 
@@ -303,19 +450,23 @@ export default function HROverview() {
       await api.patch(
         "/Salary/update-salary",
         {
-          salaryStatus: newStatus,
+          salaryStatus: statusValue,
           rejectionReason:
-            newStatus.toLowerCase() === "rejected"
+            newStatus === "Rejected"
               ? rejectionReason.trim()
               : null,
         },
         {
-          params: { empId: employeeId, salaryId },
+          params: {
+            empId: employeeId,
+            salaryId,
+          },
         }
       );
 
       setSelectedRequest(null);
       setNotice("Salary request updated successfully.");
+
       await Promise.all([loadRequests(), loadSummary()]);
     } catch (err) {
       console.error("Unable to update salary request:", err);
@@ -325,10 +476,11 @@ export default function HROverview() {
     }
   };
 
+  const query = search.trim().toLowerCase();
+
   const visibleRequests = requests.filter((request) => {
     const employeeId = String(getEmployeeId(request) ?? "");
     const requestId = String(getRequestId(request) ?? "");
-    const query = search.trim().toLowerCase();
 
     return (
       !query ||
@@ -350,48 +502,56 @@ export default function HROverview() {
     Math.ceil(employeeTotal / PAGE_SIZE)
   );
 
-  const refreshAll = async () => {
-    setNotice("");
-    await Promise.all([loadRequests(), loadSummary()]);
-
-    if (tab === "employees") {
-      await loadEmployees();
-    }
-  };
-
   return (
     <main className="mx-auto max-w-7xl space-y-6">
       <section className="rounded-2xl bg-gradient-to-r from-indigo-700 to-violet-700 p-6 text-white shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
-          WorkSphere · Human Resources
-        </p>
-
-        <div className="mt-3 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <h1 className="text-3xl font-bold">HR Dashboard</h1>
+            <p className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
+              WorkSphere · Human Resources
+            </p>
+            <h1 className="mt-3 text-3xl font-bold">HR Dashboard</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-indigo-100">
               Review salary requests and manage employees in your organization.
             </p>
           </div>
 
-          <button
-            onClick={refreshAll}
-            disabled={loading || employeesLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-60"
-          >
-            <RefreshCw
-              size={16}
-              className={loading ? "animate-spin" : ""}
-            />
-            Refresh
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={refreshAll}
+              disabled={loading || employeesLoading}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 disabled:opacity-60"
+            >
+              <RefreshCw
+                size={16}
+                className={
+                  loading || employeesLoading ? "animate-spin" : ""
+                }
+              />
+              Refresh
+            </button>
+
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
+          </div>
         </div>
       </section>
 
       {notice && (
         <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           <span>{notice}</span>
-          <button onClick={() => setNotice("")} aria-label="Dismiss">
+          <button
+            type="button"
+            onClick={() => setNotice("")}
+            aria-label="Dismiss notification"
+          >
             <X size={16} />
           </button>
         </div>
@@ -404,6 +564,7 @@ export default function HROverview() {
         ].map((item) => (
           <button
             key={item.id}
+            type="button"
             onClick={() => setTab(item.id)}
             className={`border-b-2 px-4 py-3 text-sm font-semibold ${
               tab === item.id
@@ -471,7 +632,7 @@ export default function HROverview() {
                   Salary Requests
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  Review and update salary request statuses.
+                  Review requests and update their actual status.
                 </p>
               </div>
 
@@ -499,9 +660,9 @@ export default function HROverview() {
                 >
                   <option value="">All statuses</option>
                   <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                  <option value="Released">Released</option>
+                  <option value="Reviewed">Reviewed</option>
+                  <option value="Rejected">Released</option>
+                  <option value="Released">Rejected</option>
                 </select>
               </div>
             </div>
@@ -512,7 +673,10 @@ export default function HROverview() {
               </div>
             ) : visibleRequests.length === 0 ? (
               <div className="p-10 text-center">
-                <Wallet className="mx-auto mb-3 text-gray-400" size={32} />
+                <Wallet
+                  className="mx-auto mb-3 text-gray-400"
+                  size={32}
+                />
                 <p className="font-medium text-gray-900">
                   No salary requests found
                 </p>
@@ -537,7 +701,7 @@ export default function HROverview() {
                   <tbody className="divide-y divide-gray-100">
                     {visibleRequests.map((request, index) => {
                       const id = getRequestId(request) ?? index;
-                      const status = getStatus(request);
+                      const status = getSalaryStatus(request);
 
                       return (
                         <tr key={id} className="hover:bg-gray-50">
@@ -554,29 +718,20 @@ export default function HROverview() {
                             {request.duration ?? request.Duration ?? "—"}
                           </td>
                           <td className="px-5 py-4 text-gray-600">
-                            {(() => {
-                              const date =
-                                request.requestedAt ??
-                                request.RequestedAt;
-
-                              return date
-                                ? new Date(date).toLocaleDateString()
-                                : "—";
-                            })()}
+                            {formatDate(
+                              request.requestedAt ?? request.RequestedAt
+                            )}
                           </td>
                           <td className="px-5 py-4">
-                            <span
-                              className={`rounded-full px-2.5 py-1 text-xs font-medium ${getStatusStyle(status)}`}
-                            >
-                              {status}
-                            </span>
+                            <StatusBadge status={status} />
                           </td>
                           <td className="px-5 py-4">
                             <button
+                              type="button"
                               onClick={() => openReview(request)}
                               className="rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50"
                             >
-                              Review
+                              Review / Update
                             </button>
                           </td>
                         </tr>
@@ -593,18 +748,22 @@ export default function HROverview() {
               </p>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   disabled={page <= 1 || loading}
                   onClick={() => setPage((current) => current - 1)}
                   className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm disabled:opacity-40"
                 >
-                  <ChevronLeft size={16} /> Previous
+                  <ChevronLeft size={16} />
+                  Previous
                 </button>
                 <button
+                  type="button"
                   disabled={page >= totalPages || loading}
                   onClick={() => setPage((current) => current + 1)}
                   className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm disabled:opacity-40"
                 >
-                  Next <ChevronRight size={16} />
+                  Next
+                  <ChevronRight size={16} />
                 </button>
               </div>
             </div>
@@ -620,7 +779,7 @@ export default function HROverview() {
                 Organization Employees
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                Browse employees in your organization.
+                View employees, roles and approval statuses.
               </p>
             </div>
 
@@ -644,7 +803,7 @@ export default function HROverview() {
           {employeeError && (
             <div
               role="alert"
-              className="m-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+              className="m-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
             >
               {employeeError}
             </div>
@@ -656,12 +815,15 @@ export default function HROverview() {
             </div>
           ) : employees.length === 0 ? (
             <div className="p-10 text-center">
-              <UserRound className="mx-auto mb-3 text-gray-400" size={32} />
+              <UserRound
+                className="mx-auto mb-3 text-gray-400"
+                size={32}
+              />
               <p className="font-medium text-gray-900">
                 No employees to display
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Check that the organization employee endpoint is implemented.
+                Check the organization employee endpoint and its response.
               </p>
             </div>
           ) : (
@@ -683,40 +845,29 @@ export default function HROverview() {
                         employee.id ??
                         employee.Id ??
                         employee.userId ??
+                        employee.UserId ??
                         index
                       }
                       className="hover:bg-gray-50"
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4 text-gray-600">
                         {employee.id ??
                           employee.Id ??
                           employee.userId ??
                           employee.UserId ??
                           "—"}
                       </td>
-                      
-                        <td className="px-5 py-4 font-medium text-gray-900">
-                          {(
-                            employee.fullName ??
-                            employee.FullName ??
-                            employee.name ??
-                            employee.Name ??
-                            [employee.firstName, employee.lastName]
-                              .filter(Boolean)
-                              .join(" ")
-                          ) || "—"}
-                        </td>
-
+                      <td className="px-5 py-4 font-medium text-gray-900">
+                        {getEmployeeName(employee)}
+                      </td>
                       <td className="px-5 py-4 text-gray-600">
                         {employee.email ?? employee.Email ?? "—"}
                       </td>
                       <td className="px-5 py-4 text-gray-600">
-                        {String(employee.role ?? employee.Role ?? "—")}
+                        {getEmployeeRole(employee)}
                       </td>
                       <td className="px-5 py-4">
-                        {String(
-                          employee.status ?? employee.Status ?? "—"
-                        )}
+                        <StatusBadge status={getEmployeeStatus(employee)} />
                       </td>
                     </tr>
                   ))}
@@ -731,22 +882,20 @@ export default function HROverview() {
             </p>
             <div className="flex gap-2">
               <button
+                type="button"
                 disabled={employeePage <= 1 || employeesLoading}
-                onClick={() =>
-                  setEmployeePage((current) => current - 1)
-                }
+                onClick={() => setEmployeePage((current) => current - 1)}
                 className="rounded-lg border border-gray-200 p-2 disabled:opacity-40"
                 aria-label="Previous employee page"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
+                type="button"
                 disabled={
                   employeePage >= employeePages || employeesLoading
                 }
-                onClick={() =>
-                  setEmployeePage((current) => current + 1)
-                }
+                onClick={() => setEmployeePage((current) => current + 1)}
                 className="rounded-lg border border-gray-200 p-2 disabled:opacity-40"
                 aria-label="Next employee page"
               >
@@ -758,10 +907,10 @@ export default function HROverview() {
       )}
 
       {selectedRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
           <form
             onSubmit={saveReview}
-            className="w-full max-w-lg space-y-5 rounded-2xl bg-white p-6 shadow-xl"
+            className="my-auto w-full max-w-lg space-y-5 rounded-2xl bg-white p-6 shadow-xl"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -788,6 +937,10 @@ export default function HROverview() {
               <p className="mt-1 text-2xl font-bold text-gray-900">
                 {formatMoney(getAmount(selectedRequest))}
               </p>
+              <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                Current status:
+                <StatusBadge status={getSalaryStatus(selectedRequest)} />
+              </div>
             </div>
 
             <div>
@@ -795,7 +948,7 @@ export default function HROverview() {
                 htmlFor="salaryStatus"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Decision
+                New status
               </label>
               <select
                 id="salaryStatus"
@@ -804,13 +957,14 @@ export default function HROverview() {
                 className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm"
               >
                 <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
+                <option value="Reviewed">Reviewed</option>
                 <option value="Released">Released</option>
+                
+                <option value="Rejected">Rejected</option>
               </select>
             </div>
 
-            {newStatus.toLowerCase() === "rejected" && (
+            {newStatus === "Rejected" && (
               <div>
                 <label
                   htmlFor="rejectionReason"
@@ -833,16 +987,20 @@ export default function HROverview() {
             )}
 
             {actionError && (
-              <p role="alert" className="text-sm text-red-600">
+              <div
+                role="alert"
+                className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              >
                 {actionError}
-              </p>
+              </div>
             )}
 
             <div className="flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedRequest(null)}
-                className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium"
+                disabled={saving}
+                className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
