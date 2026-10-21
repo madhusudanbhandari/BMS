@@ -12,7 +12,7 @@ export const loginUser=async(credentials)=>{
 
 export const registerOrganization = async (data) => {
   const response = await api.post(
-    "/Org/register-organization",
+    "/Org/register",
     data
   );
   return response.data;

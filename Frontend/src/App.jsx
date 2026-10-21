@@ -13,7 +13,7 @@ import TaskManagement from "./Pages/admin/TaskManagement";
 import AdminLayout from "./layout/AdminLayout";
 
 // Manager pages
-import ManagerLayout from "./components/manager/ManagerLayout";
+import ManagerLayout from "./layout/ManagerLayout";
 import ManagerDashboard from "./Pages/manager/ManagerDashboard";
 import ManagerProjects from "./Pages/manager/ManagerProjects";
 import ManagerTasks from "./Pages/manager/ManagerTasks";
