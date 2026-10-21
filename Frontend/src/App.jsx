@@ -17,6 +17,8 @@ import ManagerLayout from "./components/manager/ManagerLayout";
 import ManagerDashboard from "./Pages/manager/ManagerDashboard";
 import ManagerProjects from "./Pages/manager/ManagerProjects";
 import ManagerTasks from "./Pages/manager/ManagerTasks";
+import ManagerEmployees from "./Pages/manager/ManagerEmployees";
+import ManagerTeams from "./Pages/manager/ManagerTeams";
 
 // Employee pages
 import EmployeeLayout from "./layout/EmployeeLayout";
@@ -74,6 +76,8 @@ export default function App() {
           <Route index element={<ManagerDashboard />} />
           <Route path="projects" element={<ManagerProjects />} />
           <Route path="tasks" element={<ManagerTasks />} />
+          <Route path="teams" element={<ManagerTeams />} />
+          <Route path="employees" element={<ManagerEmployees />} />
         </Route>
 
         {/* Employee routes */}
