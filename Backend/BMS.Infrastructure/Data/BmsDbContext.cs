@@ -101,8 +101,14 @@ public class BmsDbContext : DbContext
                     .HasOne(l=>l.User)
                     .WithMany(u=>u.Leaves)
                     .HasForeignKey(l=>l.userId)
-                    .OnDelete(DeleteBehavior.Cascade);                    
+                    .OnDelete(DeleteBehavior.Cascade);  
 
+        modelBuilder.Entity<Attendence>()
+                    .HasIndex(u => new
+                    {
+                        u.DateTime,
+                        u.UserId
+                    }).IsUnique();
     }
 
 }

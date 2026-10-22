@@ -9,4 +9,5 @@ public class Organization
     public ICollection<Team> Teams{get;set;}=new List<Team>();
     public ICollection<Project> Projects{get;set;}=new List<Project>();
     public ICollection<Attendence> Attendences{get;set;}=new List<Attendence>();
+    public ICollection<Leave> Leaves{get;set;}=new List<Leave>();
 }

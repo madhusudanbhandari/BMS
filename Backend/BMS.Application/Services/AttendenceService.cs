@@ -73,4 +73,67 @@ public class AttendenceService:IAttendenceService
             Role=attendence.Role
         }).ToList();
     }
+
+    public async Task<ViewAttendenceDto> ViewEmployeeAttendence(int reqId,int EmpId)
+    {
+        var requester=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (requester == null)
+        {
+            throw new NotFoundException("Cannot find the requester");
+        }
+
+        var attendence=await _attendenceRepository.ViewEmpAttendences(EmpId);
+        if (attendence == null)
+        {
+            throw new NotFoundException("Cannot find the attendence for that user");
+        }
+
+        if (requester.OrganizationId != attendence.OrganizationId)
+        {
+            throw new BadRequestException("You cannot see the attendence of this employee");
+        }
+
+        return new ViewAttendenceDto
+        {
+            Id=attendence.Id,
+            UserId=attendence.UserId,
+            DateTime=attendence.DateTime,
+            OrganizationId=attendence.OrganizationId,
+            Role=attendence.Role
+        };
+    }
+
+    public async Task<List<ViewAttendenceDto>> ViewOrganizationAttendence(int reqId,int OrgId)
+    {
+
+        var user=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (user == null)
+        {
+            throw new Exception("Cannot find the user");
+        }
+
+
+        if (user.OrganizationId != OrgId)
+        {
+            throw new BadRequestException("You cannot see the attendences of this Organization");
+        }
+
+        var attendences=await _attendenceRepository.ViewOrgAttendences(OrgId);
+
+
+        return attendences.Select(attendence=>new ViewAttendenceDto
+        {
+            Id=attendence.Id,
+            UserId=attendence.UserId,
+            DateTime=attendence.DateTime,
+            OrganizationId=attendence.OrganizationId,
+            Role=attendence.Role
+        }).ToList();
+    }
+
+
+
+
 }

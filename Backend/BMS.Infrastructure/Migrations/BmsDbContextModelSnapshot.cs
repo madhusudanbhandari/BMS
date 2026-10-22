@@ -91,6 +91,9 @@ namespace BMS.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("DateTime", "UserId")
+                        .IsUnique();
+
                     b.ToTable("Attendences");
                 });
 
@@ -143,11 +146,14 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int>("LeaveStatus")
                         .HasColumnType("integer");
 
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("ReviewedByIdId")
+                    b.Property<int?>("ReviewedById")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("To")
@@ -158,7 +164,7 @@ namespace BMS.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReviewedByIdId");
+                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("userId");
 
@@ -439,9 +445,11 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Leave", b =>
                 {
-                    b.HasOne("BMS.Domain.Entities.User", "ReviewedById")
-                        .WithMany()
-                        .HasForeignKey("ReviewedByIdId");
+                    b.HasOne("BMS.Domain.Entities.Organization", "organization")
+                        .WithMany("Leaves")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BMS.Domain.Entities.User", "User")
                         .WithMany("Leaves")
@@ -449,9 +457,9 @@ namespace BMS.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ReviewedById");
-
                     b.Navigation("User");
+
+                    b.Navigation("organization");
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.Notification", b =>
@@ -555,6 +563,8 @@ namespace BMS.Infrastructure.Migrations
             modelBuilder.Entity("BMS.Domain.Entities.Organization", b =>
                 {
                     b.Navigation("Attendences");
+
+                    b.Navigation("Leaves");
 
                     b.Navigation("Projects");
 

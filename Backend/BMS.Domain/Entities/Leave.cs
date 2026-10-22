@@ -12,7 +12,10 @@ public class Leave
     public DateTime From{get;set;}
     public DateTime To{get;set;}
 
-    public User? ReviewedById{get;set;}
+    public int OrganizationId{get;set;}
+    public Organization? organization{get;set;}
+
+    public int? ReviewedById{get;set;}
 
     public LeaveStatus LeaveStatus{get;set;}
 

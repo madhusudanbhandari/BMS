@@ -24,6 +24,16 @@ public class AttendenceRepository:IAttendenceRepository
                                          .ToListAsync();
     }
 
+    public async Task<Attendence?> ViewEmpAttendences(int empId)
+    {
+        return await _context.Attendences.FirstOrDefaultAsync(a=>a.UserId==empId);
+    }
+
+    public async Task<List<Attendence>> ViewOrgAttendences(int orgId)
+    {
+        return await _context.Attendences.Where(a=>a.OrganizationId==orgId).ToListAsync();
+    }
+
     public async Task<bool> IsMarkedToday(int userId, DateTime today,DateTime tomorrow)
     {
         return await _context.Attendences.AnyAsync(a=>a.UserId==userId &&

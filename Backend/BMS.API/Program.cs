@@ -35,6 +35,8 @@ builder.Services.AddScoped<ISalaryService, SalaryService>();
 builder.Services.AddScoped<IEventNotificationService, EventNotificationService>();
 builder.Services.AddScoped<IAttendenceRepository,AttendenceRepository>();
 builder.Services.AddScoped<IAttendenceService, AttendenceService>();
+builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
+builder.Services.AddScoped<ILeaveService, LeaveService>();
 
 
 

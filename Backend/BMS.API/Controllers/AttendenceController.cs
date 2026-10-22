@@ -33,7 +33,7 @@ public class AttendenceController : ControllerBase
         return Ok(attendence);
     }
 
-    [HttpGet("attendence/user")]
+    [HttpGet("attendence/me")]
     public async Task<IActionResult> ViewMyAttendence()
     {
         var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -47,4 +47,34 @@ public class AttendenceController : ControllerBase
 
         return Ok(attendences);
     }
+
+    [Authorize(Roles ="OrganizationAdmin,Manager,HR")]
+    [HttpGet("attendence/employee")]
+    public async Task<IActionResult> ViewEmployeeAttendence(int empId)
+    {
+        var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(!int.TryParse(user,out int userId))
+        {
+            return Unauthorized();
+        }
+        var attendence=await _attendenceService.ViewEmployeeAttendence(userId,empId);
+
+        return Ok(attendence);
+    }
+
+    [Authorize(Roles ="OrganizationAdmin,Manager,HR")]
+    [HttpGet("attendence-orgEmployees")]
+    public async Task<IActionResult> ViewOrganizationAttendence(int orgId)
+    {
+        var user=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(!int.TryParse(user,out int userId))
+        {
+            return Unauthorized();
+        }
+        var attendence=await _attendenceService.ViewOrganizationAttendence(userId,orgId);
+
+        return Ok(attendence);
+    }
+
+    
 }

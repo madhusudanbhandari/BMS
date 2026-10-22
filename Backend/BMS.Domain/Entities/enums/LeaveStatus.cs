@@ -3,7 +3,8 @@ namespace BMS.Domain.Entities.Enums;
 
 public enum LeaveStatus
 {
-    Granted=1,
-    Cancelled=2,
-    Hold=3,
+    Pending=1,
+    Granted=2,
+    Cancelled=3,
+    Hold=4,
 }
