@@ -7,7 +7,9 @@ import {
   Users,
   Wallet,
   LogOut,
-} from "lucide-react";
+  CalendarCheck,
+  CalendarDays,
+} from "lucide-react"; "lucide-react";
 
 const EmployeeLayout = () => {
   const navigate = useNavigate();
@@ -39,6 +41,16 @@ const EmployeeLayout = () => {
       path: "/employee/salary",
       icon: Wallet,
     },
+    {
+    name:"My Attendence",
+    path:"/employee/attendance",
+    icon:CalendarCheck
+    },
+    {
+      name:"My Leaves",
+      path:"/employee/leaves",
+      icon:CalendarDays
+    }
   ];
 
   const handleLogout = () => {
