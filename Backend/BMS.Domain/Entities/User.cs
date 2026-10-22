@@ -15,6 +15,8 @@ public class User
 
     public UserStatus Status{get;set;}
     public ICollection<Team> Teams{get;set;}=new List<Team>();
+    public ICollection<Attendence> Attendences{get;set;}=new List<Attendence>();
+    public ICollection<Leave> Leaves{get;set;}=new List<Leave>();
 
     public Salary? Salary{get;set;}    
 

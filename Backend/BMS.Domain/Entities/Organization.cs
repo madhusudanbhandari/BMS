@@ -8,4 +8,5 @@ public class Organization
     public ICollection<User> Users{get;set;}=new List<User>();
     public ICollection<Team> Teams{get;set;}=new List<Team>();
     public ICollection<Project> Projects{get;set;}=new List<Project>();
+    public ICollection<Attendence> Attendences{get;set;}=new List<Attendence>();
 }

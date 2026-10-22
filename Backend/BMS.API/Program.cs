@@ -33,6 +33,9 @@ builder.Services.AddScoped<ITaskItemService, TaskItemService>();
 builder.Services.AddScoped<ISalaryRepository, SalaryRepository>();
 builder.Services.AddScoped<ISalaryService, SalaryService>();
 builder.Services.AddScoped<IEventNotificationService, EventNotificationService>();
+builder.Services.AddScoped<IAttendenceRepository,AttendenceRepository>();
+builder.Services.AddScoped<IAttendenceService, AttendenceService>();
+
 
 
 builder.Services.AddAuthentication(

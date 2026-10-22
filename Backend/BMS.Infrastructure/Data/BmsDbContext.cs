@@ -21,6 +21,9 @@ public class BmsDbContext : DbContext
     public DbSet<Notification> Notifications=>Set<Notification>();
     public DbSet<ActivityEvent> ActivityEvents=>Set<ActivityEvent>();
 
+    public DbSet<Attendence> Attendences=>Set<Attendence>();
+    public DbSet<Leave> Leaves=>Set<Leave>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -88,7 +91,17 @@ public class BmsDbContext : DbContext
                     .HasForeignKey(n=>n.ActivityEventId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                    
+        modelBuilder.Entity<Attendence>()
+                    .HasOne(a=>a.User)
+                    .WithMany(u=>u.Attendences)
+                    .HasForeignKey(a=>a.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Leave>()
+                    .HasOne(l=>l.User)
+                    .WithMany(u=>u.Leaves)
+                    .HasForeignKey(l=>l.userId)
+                    .OnDelete(DeleteBehavior.Cascade);                    
 
     }
 

@@ -65,6 +65,35 @@ namespace BMS.Infrastructure.Migrations
                     b.ToTable("ActivityEvents");
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Attendence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Attendences");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Enums.PAdmin", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +127,42 @@ namespace BMS.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("PAdmins");
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.Leave", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("LeaveStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ReviewedByIdId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("userId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedByIdId");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("Leaves");
                 });
 
             modelBuilder.Entity("BMS.Domain.Entities.Notification", b =>
@@ -353,6 +418,42 @@ namespace BMS.Infrastructure.Migrations
                     b.ToTable("TeamUser", (string)null);
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Attendence", b =>
+                {
+                    b.HasOne("BMS.Domain.Entities.Organization", "Organization")
+                        .WithMany("Attendences")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BMS.Domain.Entities.User", "User")
+                        .WithMany("Attendences")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BMS.Domain.Entities.Leave", b =>
+                {
+                    b.HasOne("BMS.Domain.Entities.User", "ReviewedById")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByIdId");
+
+                    b.HasOne("BMS.Domain.Entities.User", "User")
+                        .WithMany("Leaves")
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewedById");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("BMS.Domain.Entities.ActivityEvent", "ActivityEvent")
@@ -453,6 +554,8 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.Organization", b =>
                 {
+                    b.Navigation("Attendences");
+
                     b.Navigation("Projects");
 
                     b.Navigation("Teams");
@@ -472,6 +575,10 @@ namespace BMS.Infrastructure.Migrations
 
             modelBuilder.Entity("BMS.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Attendences");
+
+                    b.Navigation("Leaves");
+
                     b.Navigation("Salary");
                 });
 #pragma warning restore 612, 618
