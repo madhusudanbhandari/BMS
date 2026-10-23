@@ -127,7 +127,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors("ReactFrontend");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
