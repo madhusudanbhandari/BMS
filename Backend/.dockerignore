@@ -1,0 +1,14 @@
+
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/node_modules/
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+**/secrets.json
+**/appsettings.*.local.json
+.env.docker
