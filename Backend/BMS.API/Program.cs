@@ -87,12 +87,16 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ReactFrontend", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy
-            .WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "https://bms-git-main-madhusudanbhandaris-projects.vercel.app",
+                "https://bms-jzil9lbe3-madhusudanbhandaris-projects.vercel.app"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
