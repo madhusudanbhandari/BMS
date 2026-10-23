@@ -33,7 +33,7 @@ public class LeaveService : ILeaveService
             From=dto.From,
             To=dto.To,
             OrganizationId=user.OrganizationId,
-            LeaveStatus=Domain.Entities.Enums.LeaveStatus.Pending
+            LeaveStatus=LeaveStatus.Pending
         };
 
         await _leaveRepository.AddLeaveAsync(leave);
@@ -82,6 +82,29 @@ public class LeaveService : ILeaveService
         }).ToList();
     }
 
+    public async Task<List<ViewLeaveDto>> ViewOrganizationsLeaves(int reqId)
+    {
+        var user=await _authRepository.GetUserByIdAsync(reqId);
+
+        if (user == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        var leaves=await _leaveRepository.GetOrganizationsLeaves(user.OrganizationId);
+
+        return leaves.Select(leave=>new ViewLeaveDto
+        {
+            Id=leave.Id,
+            userId=leave.userId,
+            Reason=leave.Reason,
+            From=leave.From,
+            To=leave.To,
+            LeaveStatus=leave.LeaveStatus,
+            OrganizationId=leave.OrganizationId,
+            ReviewedById=leave.ReviewedById
+        }).ToList();
+    }
     public async Task<ViewLeaveDto> UpdateLeaveAsync(int reqId,int leaveId, UpdateLeaveDto dto)
     {
         var requester=await _authRepository.GetUserByIdAsync(reqId);

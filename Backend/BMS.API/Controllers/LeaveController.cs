@@ -78,4 +78,21 @@ public class LeaveController : ControllerBase
         return Ok(updated);
     }
 
+    [Authorize(Roles ="HR")]
+    [HttpGet("view-all-leaves")]
+    public async Task<IActionResult> ViewAllOrgLeaves()
+    {
+        var userClaim=User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if(!int.TryParse(userClaim,out int userId))
+        {
+            return Unauthorized();
+        }
+
+        var leaves=await _leaveService.ViewOrganizationsLeaves(userId);
+
+        return Ok(leaves);
+    }
+
+
 }

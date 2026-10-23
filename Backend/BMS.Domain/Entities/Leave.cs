@@ -9,8 +9,8 @@ public class Leave
     public User? User{get;set;}
 
     public string Reason{get;set;}=string.Empty;
-    public DateTime From{get;set;}
-    public DateTime To{get;set;}
+    public DateOnly From{get;set;}
+    public DateOnly To{get;set;}
 
     public int OrganizationId{get;set;}
     public Organization? organization{get;set;}

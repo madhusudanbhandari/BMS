@@ -91,6 +91,13 @@ public class BmsDbContext : DbContext
                     .HasForeignKey(n=>n.ActivityEventId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Salary>()
+                    .HasOne(s=>s.User)
+                    .WithMany(u=>u.Salaries)
+                    .HasForeignKey(s=>s.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+
         modelBuilder.Entity<Attendence>()
                     .HasOne(a=>a.User)
                     .WithMany(u=>u.Attendences)

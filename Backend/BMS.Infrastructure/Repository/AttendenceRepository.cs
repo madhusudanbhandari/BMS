@@ -31,7 +31,9 @@ public class AttendenceRepository:IAttendenceRepository
 
     public async Task<List<Attendence>> ViewOrgAttendences(int orgId)
     {
-        return await _context.Attendences.Where(a=>a.OrganizationId==orgId).ToListAsync();
+        return await _context.Attendences.Where(a=>a.OrganizationId==orgId)
+                                         .Include(a=>a.User)
+                                         .ToListAsync();
     }
 
     public async Task<bool> IsMarkedToday(int userId, DateTime today,DateTime tomorrow)

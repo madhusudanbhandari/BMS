@@ -140,8 +140,8 @@ namespace BMS.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("From")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("From")
+                        .HasColumnType("date");
 
                     b.Property<int>("LeaveStatus")
                         .HasColumnType("integer");
@@ -156,8 +156,8 @@ namespace BMS.Infrastructure.Migrations
                     b.Property<int?>("ReviewedById")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("To")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("To")
+                        .HasColumnType("date");
 
                     b.Property<int>("userId")
                         .HasColumnType("integer");
@@ -301,8 +301,7 @@ namespace BMS.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Salary");
                 });
@@ -493,8 +492,8 @@ namespace BMS.Infrastructure.Migrations
             modelBuilder.Entity("BMS.Domain.Entities.Salary", b =>
                 {
                     b.HasOne("BMS.Domain.Entities.User", "User")
-                        .WithOne("Salary")
-                        .HasForeignKey("BMS.Domain.Entities.Salary", "UserId")
+                        .WithMany("Salaries")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -589,7 +588,7 @@ namespace BMS.Infrastructure.Migrations
 
                     b.Navigation("Leaves");
 
-                    b.Navigation("Salary");
+                    b.Navigation("Salaries");
                 });
 #pragma warning restore 612, 618
         }

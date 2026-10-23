@@ -39,6 +39,13 @@ public class LeaveRepository : ILeaveRepository
         await _context.Leaves.AddAsync(leave);
 
     }
+    
+    public async Task<List<Leave>> GetOrganizationsLeaves(int orgId)
+    {
+        var leaves=await _context.Leaves.Where(l=>l.OrganizationId==orgId).ToListAsync();
+
+        return leaves;
+    }
 
     public async Task SaveChangesAsync()
     {
