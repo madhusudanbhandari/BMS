@@ -23,7 +23,6 @@ public static class DbSeeder
 
         var PlatformAdmin=new PAdmin
         {
-            Id=1,
             FirstName="Admin",
             LastName="One",
             Email=email,
