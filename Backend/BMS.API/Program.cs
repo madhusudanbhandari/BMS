@@ -96,9 +96,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://bms-sand-seven.vercel.app",
-                "https://bms-git-main-madhusudanbhandaris-projects.vercel.app",
-                "https://bms-jzil9lbe3-madhusudanbhandaris-projects.vercel.app"
+                "https://bms-sand-seven.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
