@@ -25,6 +25,24 @@ public class ChatRepository : IChatRepository
         return messages;
     }
 
+    public async Task<List<Chat>> ViewConversationAsync(int userId,int otherUserId)
+    {
+        
+        return await _context.Chats
+                            .Where(c=>(c.SenderId==userId && c.ReceiverId==otherUserId) ||
+                             (c.SenderId==otherUserId && c.ReceiverId==userId))
+                             .OrderBy(c=>c.SentAt)
+                             .ToListAsync();
+
+    }
+
+    public async Task<List<Chat>> ViewUnreadMessages(int senderId, int receiverId)
+    {
+        var messages=await _context.Chats
+                                    .Where(c=>c.SenderId==senderId && c.ReceiverId==receiverId && !c.isRead)
+                                    .ToListAsync();
+        return messages;
+    }
     public async Task AddMessageAsync(Chat chat)
     {
         await _context.Chats.AddAsync(chat);

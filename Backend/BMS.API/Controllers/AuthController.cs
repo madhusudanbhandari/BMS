@@ -49,7 +49,6 @@ public class AuthController : ControllerBase
         return Ok(updated);
     }
 
-    [Authorize(Roles ="OrganizationAdmin, HR, Manager")]
     [HttpGet("organization-employees")]
     public async Task<IActionResult> ViewOrgEmployees()
     {

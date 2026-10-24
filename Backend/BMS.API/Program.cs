@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using BMS.Domain.Entities;
+using BMS.Api.Hubs;
 
 var builder=WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<BmsDbContext>(options=>
 );
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IOrgRepository, OrgRepository>();
 builder.Services.AddScoped<IOrgService, OrgService>();
@@ -62,13 +64,33 @@ builder.Services.AddAuthentication(
 
 
     };
+
+    Options.Events=new JwtBearerEvents
+    {
+        OnMessageReceived =  context =>
+        {
+            var accessToken= context.Request.Query["access_token"];
+
+            var path=context.HttpContext.Request.Path;
+
+            if(!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/chatHub"))
+            {
+                context.Token=accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
+
+
 
 builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddOpenApi();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -99,8 +121,9 @@ builder.Services.AddCors(options =>
                 "https://bms-sand-seven.vercel.app"
             )
             .AllowAnyHeader()
+            .AllowCredentials()
             .AllowAnyMethod();
-    });
+    }); 
 });
 
 var app=builder.Build();
@@ -132,6 +155,8 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
 

@@ -1,6 +1,7 @@
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
+using BMS.Domain.Entities.Enums;
 using BMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,9 @@ public class AuthRepository : IAuthRepository
 
     public async Task<List<User>> GetOrgEmployees(int orgId)
     {
-        return await _context.Users.Where(u=>u.OrganizationId==orgId).ToListAsync();
+        return await _context.Users
+                        .Where(u=>u.OrganizationId==orgId && u.Status==UserStatus.Approved)
+                        .ToListAsync();
     }
     
     public async Task AddUserAsync(User user)

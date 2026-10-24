@@ -73,4 +73,65 @@ public class ChatService : IChatService
         }).ToList();
 
     }
+
+    public async Task<List<ReceiveMessageDto>> ViewConversationAsync(int userId,int otherUserId)
+    {
+        var userOne=await _authRepository.GetUserByIdAsync(userId);
+        if (userOne == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        var userTwo=await _authRepository.GetUserByIdAsync(otherUserId);
+
+        if (userTwo == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+
+        if (userOne.OrganizationId != userTwo.OrganizationId)
+        {
+            throw new BadRequestException("Both users dont belong to same organization");
+        }
+
+        var conversations=await _chatRepository.ViewConversationAsync(userOne.Id,userTwo.Id);
+
+        return conversations.Select(conversation=> new ReceiveMessageDto
+        {
+            Message=conversation.Message,
+            SenderId=conversation.SenderId
+        }).ToList();
+    }
+
+    public async Task MarkAsReadAsync(int senderId,int receiverId)
+    {
+        var sender=await _authRepository.GetUserByIdAsync(senderId);
+        if (sender == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        var receiver=await _authRepository.GetUserByIdAsync(receiverId);
+        if (receiver == null)
+        {
+            throw new NotFoundException("Cannot find the user");
+        }
+
+        if (sender.OrganizationId != receiver.OrganizationId)
+        {
+            throw new BadRequestException("Dont belong to same organization");
+        }
+
+        var unreadMessages=await _chatRepository.ViewUnreadMessages(sender.Id,receiver.Id);
+
+        foreach(var unreadMessage in unreadMessages)
+        {
+            unreadMessage.isRead=true;
+        }
+
+        await _chatRepository.SaveChangesAsync();
+
+
+    }
 }

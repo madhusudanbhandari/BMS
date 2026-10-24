@@ -1,6 +1,8 @@
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
+using BMS.Domain.Entities.Enums;
+
 
 namespace BMS.Application.Service;
 
@@ -35,8 +37,8 @@ public class OrgService : IOrgService
             LastName=request.LastName,
             Email=request.Email,
             Password=BCrypt.Net.BCrypt.HashPassword(request.Password),
-
-            Role=Domain.Entities.Enums.UserRoles.OrganizationAdmin,
+            Status=UserStatus.Approved,
+            Role=UserRoles.OrganizationAdmin,
 
             Organization=organization
         };

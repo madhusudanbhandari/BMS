@@ -85,6 +85,11 @@ public class AuthService : IAuthService
         if(!verified)
             throw new UnauthorizedAccessException("Passwords did not match");
 
+        if (existingUser.Status != UserStatus.Approved)
+        {
+            throw new BadRequestException("You are not a verified user");
+        }
+
         return new UserResponse
         {
             Id=existingUser.Id,
