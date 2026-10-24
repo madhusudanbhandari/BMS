@@ -38,6 +38,9 @@ import HRLeaveManagement from "./Pages/hr/HrLeaveManagement";
 import HRSalaryRequests from "./Pages/hr/HrSalaryRequests";
 import HROverview from "./Pages/hr/HrOverview";
 
+import Chat from "./Pages/Chat";
+
+
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
 
@@ -70,6 +73,7 @@ export default function App() {
           <Route path="pending-users" element={<PendingUsers />} />
           <Route path="projects" element={<ProjectManagement />} />
           <Route path="task-management" element={<TaskManagement />} />
+          <Route path="chat" element={<Chat/>}></Route>
         </Route>
 
         {/* Manager routes */}
@@ -86,6 +90,7 @@ export default function App() {
           <Route path="tasks" element={<ManagerTasks />} />
           <Route path="teams" element={<ManagerTeams />} />
           <Route path="employees" element={<ManagerEmployees />} />
+          <Route path="chat" element={<Chat/>}></Route>
         </Route>
 
         {/* Employee routes */}
@@ -104,6 +109,7 @@ export default function App() {
           <Route path="salary" element={<EmployeeSalary />} />
           <Route path="attendance" element={<EmployeeAttendance />} />
           <Route path="leaves" element={<EmployeeLeaves />} />  
+          <Route path="chat" element={<Chat/>}></Route>
 
         </Route>
                 <Route
@@ -113,6 +119,7 @@ export default function App() {
               <HROverview />
             </ProtectedRoute>
           }
+
         />
 
         <Route
@@ -128,7 +135,9 @@ export default function App() {
         <Route path="salary-requests" element={<HRSalaryRequests />} />
         <Route path="leaves" element={<HRLeaveManagement />} />
         <Route path="attendance" element={<HRAttendance />} />
+        <Route path="chat" element={<Chat/>}></Route>
       </Route>
+
 
         {/* Fallback route */}
         <Route

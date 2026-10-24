@@ -9,6 +9,7 @@ import {
   LogOut,
   CalendarCheck,
   CalendarDays,
+  MessageCircle,
 } from "lucide-react"; "lucide-react";
 
 const EmployeeLayout = () => {
@@ -50,6 +51,11 @@ const EmployeeLayout = () => {
       name:"My Leaves",
       path:"/employee/leaves",
       icon:CalendarDays
+    },
+    {
+      name:"Chat",
+      path:"/employee/chat",
+      icon:MessageCircle
     }
   ];
 

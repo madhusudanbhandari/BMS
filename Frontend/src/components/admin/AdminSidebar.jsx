@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   Building2,
   X,
+  MessageCircle,
+  
 } from "lucide-react";
 
 const navigation = [
@@ -20,6 +22,7 @@ const navigation = [
   { label: "Team Management", path: "/admin/teams", icon: UsersRound },
   { label: "Projects", path: "/admin/projects", icon: FolderKanban },
   { label: "Tasks", path: "/admin/task-management", icon: Users },
+  {label:"Chat", path:"/admin/chat",icon:MessageCircle}
 ];
 
 export default function AdminSidebar({ open, onClose }) {

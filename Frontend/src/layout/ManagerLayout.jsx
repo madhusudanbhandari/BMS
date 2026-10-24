@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness,
   Users,
   UsersRound,
+  MessageCircle,
 } from "lucide-react";
 
 const links = [
@@ -15,6 +16,7 @@ const links = [
   { to: "/manager/employees", label: "Employees", icon: Users },
   { to: "/manager/teams", label: "Teams", icon: UsersRound },
   { to: "/manager/tasks", label: "Tasks", icon: ListTodo },
+  {to:"/manager/chat",label:"Chat",icon:MessageCircle}
 ];
 
 export default function ManagerLayout() {

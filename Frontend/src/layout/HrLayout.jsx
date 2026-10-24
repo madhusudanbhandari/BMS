@@ -10,6 +10,7 @@ import {
   Building2,
   Menu,
   X,
+  MessageCircle,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -40,6 +41,11 @@ const navigation = [
     path: "/hr/attendance",
     icon: ClipboardCheck,
   },
+  {
+    name:"Chat",
+    path:"hr/chat",
+    icon:MessageCircle
+  }
   
 ];
 
