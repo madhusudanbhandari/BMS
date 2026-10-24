@@ -37,6 +37,8 @@ builder.Services.AddScoped<IAttendenceRepository,AttendenceRepository>();
 builder.Services.AddScoped<IAttendenceService, AttendenceService>();
 builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
 builder.Services.AddScoped<ILeaveService, LeaveService>();
+builder.Services.AddScoped<IChatRepository,ChatRepository>();
+builder.Services.AddScoped<IChatService,ChatService>();
 
 
 
@@ -94,6 +96,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
+                "https://bms-sand-seven.vercel.app",
                 "https://bms-git-main-madhusudanbhandaris-projects.vercel.app",
                 "https://bms-jzil9lbe3-madhusudanbhandaris-projects.vercel.app"
             )

@@ -23,6 +23,8 @@ public class BmsDbContext : DbContext
 
     public DbSet<Attendence> Attendences=>Set<Attendence>();
     public DbSet<Leave> Leaves=>Set<Leave>();
+    public DbSet<Chat> Chats=>Set<Chat>();
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -116,6 +118,20 @@ public class BmsDbContext : DbContext
                         u.DateTime,
                         u.UserId
                     }).IsUnique();
+        
+        modelBuilder.Entity<Chat>()
+                    .HasOne(c=>c.Sender)
+                    .WithMany()
+                    .HasForeignKey(c=>c.SenderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Chat>()
+                    .HasOne(c=>c.Receiver)
+                    .WithMany()
+                    .HasForeignKey(c=>c.ReceiverId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+
     }
 
 }

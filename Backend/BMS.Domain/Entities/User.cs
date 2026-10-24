@@ -18,4 +18,5 @@ public class User
     public ICollection<Attendence> Attendences{get;set;}=new List<Attendence>();
     public ICollection<Leave> Leaves{get;set;}=new List<Leave>();
     public ICollection<Salary> Salaries{get;set;}=new List<Salary>();
+    public ICollection<Chat> Chats{get;set;}=new List<Chat>();
 }

@@ -97,6 +97,44 @@ namespace BMS.Infrastructure.Migrations
                     b.ToTable("Attendences");
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("isRead")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Chats");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Enums.PAdmin", b =>
                 {
                     b.Property<int>("Id")
@@ -442,6 +480,29 @@ namespace BMS.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BMS.Domain.Entities.Chat", b =>
+                {
+                    b.HasOne("BMS.Domain.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BMS.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BMS.Domain.Entities.User", null)
+                        .WithMany("Chats")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("BMS.Domain.Entities.Leave", b =>
                 {
                     b.HasOne("BMS.Domain.Entities.Organization", "organization")
@@ -585,6 +646,8 @@ namespace BMS.Infrastructure.Migrations
             modelBuilder.Entity("BMS.Domain.Entities.User", b =>
                 {
                     b.Navigation("Attendences");
+
+                    b.Navigation("Chats");
 
                     b.Navigation("Leaves");
 
