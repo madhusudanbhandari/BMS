@@ -69,7 +69,9 @@ public class ChatService : IChatService
         return messages.Select(message=>new ReceiveMessageDto
         {
             Message=message.Message,
-            SenderId=message.SenderId
+            SenderId=message.SenderId,
+            ReceiverId=message.ReceiverId,
+            isRead=message.isRead
         }).ToList();
 
     }
