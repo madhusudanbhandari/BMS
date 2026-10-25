@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using BMS.Api.Hubs;
 using BMS.Api.Middleware;
+using BMS.Application.Mapping;
 
 var builder=WebApplication.CreateBuilder(args);
 
@@ -83,7 +84,10 @@ builder.Services.AddAuthentication(
     };
 });
 
-
+builder.Services.AddAutoMapper(
+    cfg=>{},
+    typeof(MappingProfile)
+);
 
 builder.Services.AddAuthorization();
 

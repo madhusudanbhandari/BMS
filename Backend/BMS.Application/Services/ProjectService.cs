@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using AutoMapper;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
@@ -10,12 +11,17 @@ public class ProjectService : IProjectService
     private readonly IProjectRepository _projectRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IAuthRepository _authRepository;
+    private readonly IMapper _mapper;
 
-    public ProjectService(IProjectRepository projectRepository,ITeamRepository teamRepository,IAuthRepository authRepository)
+    public ProjectService(IProjectRepository projectRepository,
+                            ITeamRepository teamRepository,
+                            IAuthRepository authRepository,
+                            IMapper mapper)
     {
         _projectRepository=projectRepository;
         _teamRepository=teamRepository;
         _authRepository=authRepository;
+        _mapper=mapper;
     }
 
     public async Task<ViewProjectDto> CreateProjectAsync(int requesterId,CreateProjectDto dto)
@@ -40,14 +46,7 @@ public class ProjectService : IProjectService
         await _projectRepository.AddProjectAsync(project);
         await _projectRepository.SaveChangesAsync();
 
-        return new ViewProjectDto
-        {
-            Id=project.Id,
-            Name=project.Name,
-            Description=project.Description,
-            projectStatus=project.projectStatus,
-            OrganizationId=project.OrganizationId
-        };
+        return _mapper.Map<ViewProjectDto>(project);
     }
 
     public async Task<ViewProjectDto?> ViewProjectByIdAsync(int requesterId,int projId)
@@ -74,14 +73,7 @@ public class ProjectService : IProjectService
             throw new Exception("You cannot control this organization");
         }
 
-        return new ViewProjectDto
-        {
-            Id=project.Id,
-            Name=project.Name,
-            Description=project.Description,
-            projectStatus=project.projectStatus,
-            OrganizationId=project.OrganizationId
-        }; 
+        return _mapper.Map<ViewProjectDto>(project);
     }
 
     public async Task<List<ViewProjectDto>> ViewAllProjectsAsync(int requesterId,int orgId)
@@ -102,15 +94,7 @@ public class ProjectService : IProjectService
         }
         var projects=await _projectRepository.GetAllProjectsAsync(orgId);
 
-        return projects.Select(project=>new ViewProjectDto
-        {
-            Id=project.Id,
-            Name=project.Name,
-            Description=project.Description,
-            projectStatus=project.projectStatus,
-            OrganizationId=project.OrganizationId
-        }).ToList();
-
+        return _mapper.Map<List<ViewProjectDto>>(projects);
     }
 
     public async Task<ViewProjectDto?> UpdateProjectAsync(int requesterId,int projId, UpdateProjectDto dto)
@@ -144,14 +128,7 @@ public class ProjectService : IProjectService
 
         await _projectRepository.SaveChangesAsync();
 
-        return new ViewProjectDto
-        {
-            Id=project.Id,
-            Name=project.Name,
-            Description=project.Description,
-            projectStatus=project.projectStatus,
-            OrganizationId=project.OrganizationId
-        };
+        return _mapper.Map<ViewProjectDto>(project);
     }
 
     public async Task<bool?> DeleteProjectAsync(int requesterId,int projId)
@@ -219,14 +196,7 @@ public class ProjectService : IProjectService
 
         await _projectRepository.SaveChangesAsync();
 
-        return new ViewProjectDto
-        {
-            Id=project.Id,
-            Name=project.Name,
-            Description=project.Description,
-            projectStatus=project.projectStatus,
-            OrganizationId=project.OrganizationId
-        };
+        return _mapper.Map<ViewProjectDto>(project);
 
     }
 

@@ -1,3 +1,4 @@
+using AutoMapper;
 using BMS.Application.Exceptions;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
@@ -8,11 +9,13 @@ public class AttendenceService:IAttendenceService
 {
     private readonly IAttendenceRepository _attendenceRepository;
     private readonly IAuthRepository _authRepository;
+    private readonly IMapper _mapper;
 
-    public AttendenceService(IAttendenceRepository attendenceRepository,IAuthRepository authRepository)
+    public AttendenceService(IAttendenceRepository attendenceRepository,IAuthRepository authRepository,IMapper mapper)
     {
         _attendenceRepository=attendenceRepository;
         _authRepository=authRepository;
+        _mapper=mapper;
     }
 
 
@@ -48,14 +51,7 @@ public class AttendenceService:IAttendenceService
         await _attendenceRepository.AddAttendence(attendence);
         await _attendenceRepository.SaveChangesAsync();
 
-        return new ViewAttendenceDto
-        {
-            Id=attendence.Id,
-            UserId=attendence.UserId,
-            DateTime=attendence.DateTime,
-            OrganizationId=attendence.OrganizationId,
-            Role=attendence.Role
-        };
+        return _mapper.Map<ViewAttendenceDto>(attendence);
 
         
     }
@@ -64,14 +60,7 @@ public class AttendenceService:IAttendenceService
     {
         var attendences=await _attendenceRepository.ViewMyAttendences(id);
 
-        return attendences.Select(attendence=>new ViewAttendenceDto
-        {
-            Id=attendence.Id,
-            UserId=attendence.UserId,
-            DateTime=attendence.DateTime,
-            OrganizationId=attendence.OrganizationId,
-            Role=attendence.Role
-        }).ToList();
+        return _mapper.Map<List<ViewAttendenceDto>>(attendences);
     }
 
     public async Task<ViewAttendenceDto> ViewEmployeeAttendence(int reqId,int EmpId)
@@ -94,14 +83,7 @@ public class AttendenceService:IAttendenceService
             throw new BadRequestException("You cannot see the attendence of this employee");
         }
 
-        return new ViewAttendenceDto
-        {
-            Id=attendence.Id,
-            UserId=attendence.UserId,
-            DateTime=attendence.DateTime,
-            OrganizationId=attendence.OrganizationId,
-            Role=attendence.Role
-        };
+        return _mapper.Map<ViewAttendenceDto>(attendence);
     }
 
     public async Task<List<ViewAttendenceDto>> ViewOrganizationAttendence(int reqId,int OrgId)
@@ -123,17 +105,8 @@ public class AttendenceService:IAttendenceService
         var attendences=await _attendenceRepository.ViewOrgAttendences(OrgId);
 
 
-        return attendences.Select(attendence=>new ViewAttendenceDto
-        {
-            Id=attendence.Id,
-            UserId=attendence.UserId,
-            DateTime=attendence.DateTime,
-            OrganizationId=attendence.OrganizationId,
-            Role=attendence.Role
-        }).ToList();
+        return _mapper.Map<List<ViewAttendenceDto>>(attendences);
     }
-
-
 
 
 }

@@ -1,6 +1,8 @@
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using BMS.Application.Exceptions;
+using AutoMapper;
+using BMS.Domain.Entities;
 
 namespace BMS.Application.Service;
 
@@ -9,11 +11,16 @@ public class AdminService : IAdminService
     private readonly IAdminRepository _adminRepository;
     private readonly IAuthRepository _authRepository;
     private readonly IEventNotificationService _eventNotificationService;
-    public AdminService(IAdminRepository adminRepository,IAuthRepository authRepository,IEventNotificationService eventNotificationService)
+    private readonly IMapper _mapper;
+    public AdminService(IAdminRepository adminRepository,
+                            IAuthRepository authRepository,
+                            IEventNotificationService eventNotificationService,
+                            IMapper mapper)
     {
         _adminRepository=adminRepository;
         _authRepository=authRepository;
         _eventNotificationService=eventNotificationService;
+        _mapper=mapper;
     }
 
     public async Task<List<ViewPendingUser>> ViewAllPendingUsersAsync(int adminId)
@@ -30,16 +37,18 @@ public class AdminService : IAdminService
 
         var users=await _adminRepository.GetPendingUsersByOrganizationAsync(orgId);
 
-        return users.Select(user=>new ViewPendingUser
-        {
-            Id=user.Id,
-            FirstName=user.FirstName,
-            LastName=user.LastName,
-            Email=user.Email,
-            OrganizationId=user.OrganizationId,
-            UserStatus=user.Status,
-            Role=user.Role.ToString()            
-        }).ToList();
+        // return users.Select(user=>new ViewPendingUser
+        // {
+        //     Id=user.Id,
+        //     FirstName=user.FirstName,
+        //     LastName=user.LastName,
+        //     Email=user.Email,
+        //     OrganizationId=user.OrganizationId,
+        //     UserStatus=user.Status,
+        //     Role=user.Role.ToString()            
+        // }).ToList();
+
+        return _mapper.Map<List<ViewPendingUser>>(users);
     }
 
     public async Task<ViewPendingUser> VerifyUserRequest(int adminId,VerifyUserDto dto)
@@ -75,16 +84,7 @@ public class AdminService : IAdminService
 
         await _authRepository.SaveChangesAsync();
 
-        return new ViewPendingUser
-        {
-            Id=user.Id,
-            FirstName=user.FirstName,
-            LastName=user.LastName,
-            Email=user.Email,
-            OrganizationId=user.OrganizationId,
-            UserStatus=user.Status,
-            Role=user.Role.ToString()
-        };
+        return _mapper.Map<ViewPendingUser>(user);
     }
 
 
