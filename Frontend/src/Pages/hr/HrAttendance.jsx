@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardCheck, RefreshCw, UsersRound, UserCheck, UserX, Clock } from "lucide-react";
+import {
+  ClipboardCheck,
+  RefreshCw,
+  UsersRound,
+  UserCheck,
+  UserX,
+  Clock,
+} from "lucide-react";
 import attendanceApi from "../../api/attendenceApi";
 
 import {
   getItems,
   getErrorMessage,
   employeeIdOf,
-  employeeName,
   dateText,
   normalizeStatus,
   StatusBadge,
@@ -52,8 +58,6 @@ export default function HRAttendance() {
 
       const data = getItems(response);
 
-
-      // Filter records by the selected date.
       const filteredData = data.filter((item) => {
         const attendanceDate =
           item.date ??
@@ -150,7 +154,6 @@ export default function HRAttendance() {
 
       <ErrorMessage>{error}</ErrorMessage>
 
-      {/* Date filter */}
       <section className="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-end sm:justify-between">
         <div>
           <label
@@ -177,7 +180,6 @@ export default function HRAttendance() {
         </p>
       </section>
 
-      {/* Summary cards */}
       <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => {
           const Icon = card.icon;
@@ -209,7 +211,6 @@ export default function HRAttendance() {
         })}
       </section>
 
-      {/* Attendance table */}
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <div>
@@ -256,10 +257,9 @@ export default function HRAttendance() {
               <thead className="bg-slate-50 text-slate-500">
                 <tr>
                   {[
-                    "Employee ID",
-                    "Employee Name",
+                    "Attendance ID",
+                    "User ID",
                     "Attendance Date",
-                    "Status",
                   ].map((heading) => (
                     <th
                       key={heading}
@@ -272,56 +272,33 @@ export default function HRAttendance() {
               </thead>
 
               <tbody className="divide-y divide-slate-100">
-                {items.map((item, index) => {
-                  const nestedEmployee =
-                    item.employee ?? item.Employee;
+                {items.map((item, index) => (
+                  <tr
+                    key={item.id ?? item.Id ?? index}
+                    className="transition-colors hover:bg-slate-50"
+                  >
+                    <td className="whitespace-nowrap px-5 py-4 font-medium text-slate-900">
+                      {item.id ?? item.Id ?? "—"}
+                    </td>
 
-                  const name =
-                    item.employeeName ??
-                    item.EmployeeName ??
-                    (nestedEmployee
-                      ? employeeName(nestedEmployee)
-                      : "Unknown Employee");
+                    <td className="whitespace-nowrap px-5 py-4 text-slate-600">
+                      {employeeIdOf(item) ??
+                        item.userId ??
+                        item.UserId ??
+                        "—"}
+                    </td>
 
-                  return (
-                    <tr
-                      key={item.id ?? item.Id ?? index}
-                      className="transition-colors hover:bg-slate-50"
-                    >
-                      <td className="whitespace-nowrap px-5 py-4 text-slate-600">
-                        {employeeIdOf(item) ?? "—"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 font-semibold text-indigo-700">
-                            {name !== "Unknown Employee"
-                              ? name.charAt(0).toUpperCase()
-                              : "?"}
-                          </div>
-
-                          <span className="font-semibold text-slate-900">
-                            {name}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td className="whitespace-nowrap px-5 py-4 text-slate-600">
-                        {dateText(
-                          item.date ??
-                            item.Date ??
-                            item.attendanceDate ??
-                            item.AttendanceDate ??
-                            date
-                        )}
-                      </td>
-
-                      <td className="whitespace-nowrap px-5 py-4">
-                        <StatusBadge status={statusOf(item)} />
-                      </td>
-                    </tr>
-                  );
-                })}
+                    <td className="whitespace-nowrap px-5 py-4 text-slate-600">
+                      {dateText(
+                        item.date ??
+                          item.Date ??
+                          item.attendanceDate ??
+                          item.AttendanceDate ??
+                          date
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

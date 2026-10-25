@@ -301,8 +301,21 @@ function Chat() {
 
       try {
         const response = await chatService.getMyMessages();
+
+        console.log("My messages API response:", response);
+
         const allMessages = getConversationList(response);
 
+        console.log("Parsed messages:", allMessages);
+
+        console.log(
+          "Unread incoming messages:",
+          allMessages.filter(
+            (message) =>
+              String(getMessageReceiverId(message)) === String(currentUserId) &&
+              isUnreadMessage(message)
+          )
+        );
         const unreadSenderIds = [
           ...new Set(
             allMessages

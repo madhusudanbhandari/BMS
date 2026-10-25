@@ -5,12 +5,13 @@ import {
   Wallet,
   CalendarDays,
   ClipboardCheck,
-  ChartNoAxesCombined,
   LogOut,
   Building2,
   Menu,
   X,
   MessageCircle,
+  ChevronDown,
+  Mail,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -42,16 +43,42 @@ const navigation = [
     icon: ClipboardCheck,
   },
   {
-    name:"Chat",
-    path:"hr/chat",
-    icon:MessageCircle
-  }
-  
+    name: "Chat",
+    path: "/hr/chat",
+    icon: MessageCircle,
+  },
 ];
 
 export default function HRLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  // Read the logged-in user from localStorage
+  const [user] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  // Match your actual stored user properties
+  const fullName =
+    `${user?.firstName || user?.FirstName || ""} ${
+      user?.lastName || user?.LastName || ""
+    }`.trim() || "HR Administrator";
+
+  const email = user?.email || user?.Email || "";
+  const role = user?.role || user?.Role || "HR";
+
+  const initials = fullName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   function handleLogout() {
     [
@@ -163,8 +190,23 @@ export default function HRLayout() {
           </div>
         </div>
 
-        {/* Logout */}
+        {/* Sidebar user information and logout */}
         <div className="border-t border-slate-100 p-4">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+              {initials}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-800">
+                {fullName}
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                {role}
+              </p>
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={handleLogout}
@@ -178,6 +220,7 @@ export default function HRLayout() {
 
       {/* Main content */}
       <div className="min-h-screen lg:pl-72">
+        {/* Header */}
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -191,7 +234,7 @@ export default function HRLayout() {
 
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                HR Dashboard
+                Welcome back, {fullName}
               </h2>
               <p className="hidden text-sm text-slate-500 sm:block">
                 Human resources management
@@ -199,22 +242,83 @@ export default function HRLayout() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-slate-800">
-                HR Administrator
-              </p>
-              <p className="text-xs text-slate-500">
-                Human Resources
-              </p>
-            </div>
+          {/* User profile dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowProfile((previous) => !previous)}
+              aria-expanded={showProfile}
+              aria-label="Toggle profile menu"
+              className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-50 sm:px-3"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                {initials}
+              </div>
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-              HR
-            </div>
+              <div className="hidden text-left sm:block">
+                <p className="max-w-40 truncate text-sm font-semibold text-slate-800">
+                  {fullName}
+                </p>
+                <p className="text-xs text-slate-500">{role}</p>
+              </div>
+
+              <ChevronDown
+                size={16}
+                className={`text-slate-500 transition-transform ${
+                  showProfile ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {showProfile && (
+              <>
+                {/* Close dropdown when clicking outside */}
+                <button
+                  type="button"
+                  aria-label="Close profile menu"
+                  onClick={() => setShowProfile(false)}
+                  className="fixed inset-0 z-40 cursor-default"
+                />
+
+                <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+                  <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg font-bold text-indigo-700">
+                      {initials}
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-slate-900">
+                        {fullName}
+                      </p>
+                      <p className="text-sm text-slate-500">{role}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 py-4">
+                    <Mail
+                      size={18}
+                      className="mt-0.5 shrink-0 text-slate-400"
+                    />
+                    <p className="break-all text-sm text-slate-600">
+                      {email || "No email available"}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    <LogOut size={18} />
+                    Sign out
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
+        {/* Current page */}
         <main className="p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>

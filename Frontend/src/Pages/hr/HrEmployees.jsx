@@ -15,7 +15,6 @@ import {
   employeeIdOf,
   employeeName,
   normalizeStatus,
-  StatusBadge,
   PageHeader,
   ErrorMessage,
 } from "./HrUtils";
@@ -26,12 +25,6 @@ const roles = {
   3: "Employee",
   4: "Manager",
   5: "HR",
-};
-
-const statuses = {
-  1: "Pending",
-  2: "Approved",
-  3: "Rejected",
 };
 
 export default function HREmployees() {
@@ -140,8 +133,8 @@ export default function HREmployees() {
                     "Employee ID",
                     "Name",
                     "Email",
-                    "Role",
-                    "Status",
+                    "Role"
+                   
                   ].map((heading) => (
                     <th
                       key={heading}
@@ -178,14 +171,7 @@ export default function HREmployees() {
                       )}
                     </td>
 
-                    <td className="px-5 py-4">
-                      <StatusBadge
-                        status={normalizeStatus(
-                          employee.status ?? employee.Status,
-                          statuses
-                        )}
-                      />
-                    </td>
+                    
                   </tr>
                 ))}
               </tbody>

@@ -6,7 +6,6 @@ import {
   field,
   listFromResponse,
   errorMessage,
-  StatusBadge,
 } from "./managerUtils";
 
 function roleLabel(value) {
@@ -19,16 +18,6 @@ function roleLabel(value) {
   };
 
   return roles[value] ?? String(value ?? "Unknown");
-}
-
-function employeeStatus(value) {
-  const statuses = {
-    1: "Pending",
-    2: "Approved",
-    3: "Rejected",
-  };
-
-  return statuses[value] ?? String(value ?? "Unknown");
 }
 
 export default function ManagerEmployees() {
@@ -64,7 +53,6 @@ export default function ManagerEmployees() {
       field(employee, "name", "Name", "fullName", "FullName"),
       field(employee, "email", "Email"),
       field(employee, "role", "Role", "userRole", "UserRole"),
-      field(employee, "status", "Status", "userStatus", "UserStatus"),
     ].some((value) => String(value ?? "").toLowerCase().includes(query));
   });
 
@@ -87,7 +75,10 @@ export default function ManagerEmployees() {
       </div>
 
       {error && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
           {error}
         </div>
       )}
@@ -95,18 +86,31 @@ export default function ManagerEmployees() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">Employees returned</p>
+            <p className="text-sm font-medium text-slate-500">
+              Employees returned
+            </p>
             <Users className="text-indigo-600" size={22} />
           </div>
-          <p className="mt-3 text-3xl font-bold text-slate-900">{employees.length}</p>
+          <p className="mt-3 text-3xl font-bold text-slate-900">
+            {employees.length}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Pending accounts</p>
           <p className="mt-3 text-3xl font-bold text-slate-900">
             {employees.filter((employee) => {
-              const value = field(employee, "status", "Status", "userStatus", "UserStatus");
-              return String(value).toLowerCase() === "pending" || Number(value) === 1;
+              const value = field(
+                employee,
+                "status",
+                "Status",
+                "userStatus",
+                "UserStatus"
+              );
+              return (
+                String(value).toLowerCase() === "pending" ||
+                Number(value) === 1
+              );
             }).length}
           </p>
         </div>
@@ -115,14 +119,19 @@ export default function ManagerEmployees() {
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-col justify-between gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center">
           <div>
-            <h2 className="font-bold text-slate-900">Organization employees</h2>
+            <h2 className="font-bold text-slate-900">
+              Organization employees
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
               {filteredEmployees.length} employee(s) displayed
             </p>
           </div>
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={17}
+            />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -134,7 +143,8 @@ export default function ManagerEmployees() {
 
         {loading ? (
           <div className="flex items-center justify-center gap-2 p-10 text-slate-500">
-            <RefreshCw className="animate-spin" size={18} /> Loading employees...
+            <RefreshCw className="animate-spin" size={18} />
+            Loading employees...
           </div>
         ) : filteredEmployees.length === 0 ? (
           <div className="p-10 text-center text-sm text-slate-500">
@@ -148,7 +158,6 @@ export default function ManagerEmployees() {
                   <th className="px-5 py-4 font-semibold">Employee</th>
                   <th className="px-5 py-4 font-semibold">Email</th>
                   <th className="px-5 py-4 font-semibold">Role</th>
-                  <th className="px-5 py-4 font-semibold">Status</th>
                   <th className="px-5 py-4 font-semibold">Employee ID</th>
                 </tr>
               </thead>
@@ -156,22 +165,39 @@ export default function ManagerEmployees() {
               <tbody className="divide-y divide-slate-100">
                 {filteredEmployees.map((employee, index) => {
                   const id = field(employee, "id", "Id", "userId", "UserId");
-                  const name = field(employee, "name", "Name", "fullName", "FullName");
+                  const name = field(
+                    employee,
+                    "name",
+                    "Name",
+                    "fullName",
+                    "FullName"
+                  );
                   const email = field(employee, "email", "Email");
-                  const role = field(employee, "role", "Role", "userRole", "UserRole");
-                  const status = field(employee, "status", "Status", "userStatus", "UserStatus");
+                  const role = field(
+                    employee,
+                    "role",
+                    "Role",
+                    "userRole",
+                    "UserRole"
+                  );
 
                   return (
-                    <tr key={id ?? email ?? index} className="hover:bg-slate-50">
+                    <tr
+                      key={id ?? email ?? index}
+                      className="hover:bg-slate-50"
+                    >
                       <td className="px-5 py-4 font-semibold text-slate-800">
                         {name ?? "—"}
                       </td>
-                      <td className="px-5 py-4 text-slate-600">{email ?? "—"}</td>
-                      <td className="px-5 py-4 text-slate-600">{roleLabel(role)}</td>
-                      <td className="px-5 py-4">
-                        <StatusBadge value={employeeStatus(status)} />
+                      <td className="px-5 py-4 text-slate-600">
+                        {email ?? "—"}
                       </td>
-                      <td className="px-5 py-4 text-slate-500">{id ?? "—"}</td>
+                      <td className="px-5 py-4 text-slate-600">
+                        {roleLabel(role)}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500">
+                        {id ?? "—"}
+                      </td>
                     </tr>
                   );
                 })}

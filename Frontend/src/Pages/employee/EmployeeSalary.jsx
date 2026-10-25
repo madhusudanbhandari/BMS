@@ -38,10 +38,40 @@ function getAmount(salary) {
     salary.SalaryAmount ?? salary.baseSalary ?? salary.BaseSalary;
 }
 
+
 function getStatus(salary) {
-  return salary.salaryStatus ?? salary.SalaryStatus ??
-    salary.status ?? salary.Status ?? "Not specified";
+  const value =
+    salary.salaryStatus ??
+    salary.SalaryStatus ??
+    salary.status ??
+    salary.Status;
+
+  if (value === null || value === undefined || value === "") {
+    return "Not specified";
+  }
+
+  const statuses = {
+    1: "Pending",
+    2: "Reviewed",
+    3: "Released",
+    4: "Rejected",
+  };
+
+  // Convert numeric or numeric-string enum values.
+  const numericValue = Number(value);
+
+  if (
+    typeof value === "number" ||
+    (typeof value === "string" && value.trim() !== "" &&
+      Number.isInteger(numericValue))
+  ) {
+    return statuses[numericValue] ?? "Unknown";
+  }
+
+  // Preserve readable string statuses returned by the API.
+  return String(value);
 }
+
 
 function getRequestedAt(salary) {
   return salary.requestedAt ?? salary.RequestedAt ??

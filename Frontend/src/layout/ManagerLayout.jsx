@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -16,17 +17,64 @@ const links = [
   { to: "/manager/employees", label: "Employees", icon: Users },
   { to: "/manager/teams", label: "Teams", icon: UsersRound },
   { to: "/manager/tasks", label: "Tasks", icon: ListTodo },
-  {to:"/manager/chat",label:"Chat",icon:MessageCircle}
+  { to: "/manager/chat", label: "Chat", icon: MessageCircle },
 ];
+
+function getManagerInfo() {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const name =
+      user.name ??
+      user.Name ??
+      user.fullName ??
+      user.FullName ??
+      user.username ??
+      user.Username ??
+      "Manager";
+
+    const email = user.email ?? user.Email ?? "Email not available";
+
+    const role = user.role ?? user.Role ?? user.userRole ?? user.UserRole;
+
+    const roleNames = {
+      1: "Organization Admin",
+      2: "Platform Admin",
+      3: "Employee",
+      4: "Manager",
+      5: "HR",
+    };
+
+    return {
+      name,
+      email,
+      role: role == null ? "Manager" : roleNames[role] ?? String(role),
+    };
+  } catch {
+    return {
+      name: "Manager",
+      email: "Email not available",
+      role: "Manager",
+    };
+  }
+}
 
 export default function ManagerLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const manager = getManagerInfo();
+
+  const activePage =
+    links.find((link) =>
+      link.end
+        ? location.pathname === link.to
+        : location.pathname.startsWith(link.to)
+    )?.label ?? "Workspace";
 
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // Clear any other common auth keys if your app uses them.
     localStorage.removeItem("authToken");
     localStorage.removeItem("jwtToken");
 
@@ -93,24 +141,47 @@ export default function ManagerLayout() {
 
       {/* Main content */}
       <main className="min-w-0 flex-1">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur sm:px-8">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
-              Workspace management
-            </p>
-            <h2 className="mt-1 truncate text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
-              Manager Portal
-            </h2>
-          </div>
+        {/* Header with manager information */}
+        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur sm:px-8">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">
+                WorkSphere / {activePage}
+              </p>
 
-          <div className="flex shrink-0 items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-indigo-600" />
-            <span className="text-xs font-semibold text-indigo-700">
-              Manager
-            </span>
+              <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                Manager Dashboard
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Manage your teams, projects, employees, and tasks.
+              </p>
+            </div>
+
+            {/* Manager profile */}
+            <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:max-w-sm">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg font-bold text-indigo-700">
+                {String(manager.name).charAt(0).toUpperCase()}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {manager.name}
+                </p>
+
+                <p className="truncate text-xs text-slate-500">
+                  {manager.email}
+                </p>
+
+                <span className="mt-1 inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                  {manager.role}
+                </span>
+              </div>
+            </div>
           </div>
         </header>
 
+        {/* Page content */}
         <div className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
           <Outlet />
         </div>

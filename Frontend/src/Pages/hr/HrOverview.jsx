@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import {
   Users,
   Wallet,
-  Clock3,
-  CheckCircle2,
   CalendarDays,
   ClipboardCheck,
   ArrowUpRight,
@@ -50,8 +48,7 @@ export default function HROverview() {
   const [stats, setStats] = useState({
     employees: 0,
     salaryRequests: 0,
-    pendingSalary: 0,
-    processedSalary: 0,
+    leaveRequests: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -62,49 +59,53 @@ export default function HROverview() {
     setError("");
 
     try {
-      const [
-        employeesRes,
-        allRes,
-        pendingRes,
-        reviewedRes,
-        rejectedRes,
-        releasedRes,
-      ] = await Promise.all([
+      const results = await Promise.allSettled([
         api.get("/Auth/organization-employees", {
           params: { page: 1, pageSize: 1 },
         }),
         api.get("/Salary/view-all-requests", {
           params: { page: 1, pageSize: 1 },
         }),
-        api.get("/Salary/view-all-requests", {
-          params: { page: 1, pageSize: 1, status: "Pending" },
-        }),
-        api.get("/Salary/view-all-requests", {
-          params: { page: 1, pageSize: 1, status: "Reviewed" },
-        }),
-        api.get("/Salary/view-all-requests", {
-          params: { page: 1, pageSize: 1, status: "Rejected" },
-        }),
-        api.get("/Salary/view-all-requests", {
-          params: { page: 1, pageSize: 1, status: "Released" },
+        api.get("/Leave/view-all-leaves", {
+          params: { page: 1, pageSize: 1 },
         }),
       ]);
 
-      setStats({
-        employees: getTotal(
-          employeesRes,
-          getItems(employeesRes)
-        ),
-        salaryRequests: getTotal(allRes, getItems(allRes)),
-        pendingSalary: getTotal(
-          pendingRes,
-          getItems(pendingRes)
-        ),
-        processedSalary:
-          getTotal(reviewedRes, getItems(reviewedRes)) +
-          getTotal(rejectedRes, getItems(rejectedRes)) +
-          getTotal(releasedRes, getItems(releasedRes)),
-      });
+      const [employeesResult, salaryResult, leaveResult] = results;
+
+      setStats((previous) => ({
+        employees:
+          employeesResult.status === "fulfilled"
+            ? getTotal(
+                employeesResult.value,
+                getItems(employeesResult.value)
+              )
+            : previous.employees,
+
+        salaryRequests:
+          salaryResult.status === "fulfilled"
+            ? getTotal(
+                salaryResult.value,
+                getItems(salaryResult.value)
+              )
+            : previous.salaryRequests,
+
+        leaveRequests:
+          leaveResult.status === "fulfilled"
+            ? getTotal(
+                leaveResult.value,
+                getItems(leaveResult.value)
+              )
+            : previous.leaveRequests,
+      }));
+
+      const failedResult = results.find(
+        (result) => result.status === "rejected"
+      );
+
+      if (failedResult) {
+        setError(getErrorMessage(failedResult.reason));
+      }
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -132,18 +133,11 @@ export default function HROverview() {
       to: "/hr/salary-requests",
     },
     {
-      label: "Pending salary requests",
-      value: stats.pendingSalary,
-      icon: Clock3,
+      label: "Leave requests",
+      value: stats.leaveRequests,
+      icon: CalendarDays,
       tone: "bg-amber-50 text-amber-600",
-      to: "/hr/salary-requests",
-    },
-    {
-      label: "Processed salary requests",
-      value: stats.processedSalary,
-      icon: CheckCircle2,
-      tone: "bg-emerald-50 text-emerald-600",
-      to: "/hr/salary-requests",
+      to: "/hr/leaves",
     },
   ];
 
@@ -151,7 +145,7 @@ export default function HROverview() {
     <div className="mx-auto max-w-7xl">
       <PageHeader
         title="HR Overview"
-        description="A quick view of employee and salary activity in your organization."
+        description="A quick view of employee, salary, and leave activity in your organization."
         action={
           <button
             onClick={load}
@@ -169,7 +163,7 @@ export default function HROverview() {
 
       <ErrorMessage>{error}</ErrorMessage>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map(({ label, value, icon: Icon, tone, to }) => (
           <Link
             key={label}
@@ -214,13 +208,18 @@ export default function HROverview() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-slate-900">{title}</h3>
+                <h3 className="font-semibold text-slate-900">
+                  {title}
+                </h3>
                 <p className="mt-1 text-sm leading-5 text-slate-500">
                   {description}
                 </p>
               </div>
 
-              <ArrowUpRight size={18} className="text-slate-400" />
+              <ArrowUpRight
+                size={18}
+                className="text-slate-400"
+              />
             </Link>
           ))}
         </div>

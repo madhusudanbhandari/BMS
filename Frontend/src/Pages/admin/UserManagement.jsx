@@ -6,10 +6,8 @@ const roles = [
   { label: "Employee", value: "Employee" },
   { label: "HR", value: "HR" },
   { label: "Manager", value: "Manager" },
-  { label: "Organization Admin", value: "OrganizationAdmin" },
 ];
 
-// Must match the C# UserRoles enum values.
 const roleMap = {
   OrganizationAdmin: 1,
   PlatformAdmin: 2,
@@ -64,7 +62,7 @@ export default function PendingUsers() {
       const selectedRole = selectedRoles[userId] || "Employee";
       const numericRole = roleMap[selectedRole];
 
-      if (approved && numericRole === undefined) {
+      if (approved && !["Employee", "HR", "Manager"].includes(selectedRole)) {
         setError("Please select a valid role.");
         return;
       }
@@ -72,7 +70,7 @@ export default function PendingUsers() {
       await verifyUser({
         UserId: Number(userId),
         Status: approved ? 2 : 3,
-        Role: numericRole ?? roleMap.Employee,
+        Role: approved ? numericRole : roleMap.Employee,
       });
 
       setMessage(
@@ -98,9 +96,11 @@ export default function PendingUsers() {
           <p className="text-sm font-semibold text-indigo-600">
             WORKSPHERE / ADMINISTRATION
           </p>
+
           <h1 className="mt-2 text-3xl font-bold text-gray-900">
             User Approvals
           </h1>
+
           <p className="mt-2 text-gray-500">
             Review registration requests from people joining your
             organization.
@@ -131,6 +131,7 @@ export default function PendingUsers() {
               <h2 className="text-lg font-semibold text-gray-900">
                 Pending requests
               </h2>
+
               <p className="mt-1 text-sm text-gray-500">
                 {users.length} request
                 {users.length === 1 ? "" : "s"} awaiting review
@@ -156,6 +157,7 @@ export default function PendingUsers() {
               <h3 className="font-semibold text-gray-900">
                 All caught up!
               </h3>
+
               <p className="mt-2 text-sm text-gray-500">
                 There are no pending registration requests.
               </p>
@@ -187,9 +189,11 @@ export default function PendingUsers() {
                               .filter(Boolean)
                               .join(" ") || `User ${id}`}
                           </h3>
+
                           <p className="mt-1 text-sm text-gray-500">
                             {email}
                           </p>
+
                           <p className="mt-1 text-xs text-gray-400">
                             User ID: {id}
                           </p>
