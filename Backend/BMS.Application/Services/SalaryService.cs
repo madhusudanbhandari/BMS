@@ -1,4 +1,5 @@
 using BMS.Application.Dtos;
+using BMS.Application.Exceptions;
 using BMS.Application.Interface;
 using BMS.Domain.Entities;
 using BMS.Domain.Entities.Enums;
@@ -94,7 +95,7 @@ public class SalaryService : ISalaryService
 
         if (salary.SalaryStatus != SalaryStatus.Pending)
         {
-            throw new InvalidOperationException("Only pending salaries can be reviewed");
+            throw new ConflictException("Only pending salaries can be reviewed");
         }
 
         if(dto.SalaryStatus!=SalaryStatus.Released && dto.SalaryStatus != SalaryStatus.Rejected)

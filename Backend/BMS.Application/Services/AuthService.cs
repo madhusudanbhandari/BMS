@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         var user=await _authRepository.GetUserByEmailAsync(request.Email);
 
         if(user!=null)
-            throw new NotFoundException("User with that email already exists");
+            throw new BadRequestException("User with that email already exists");
 
         var newUser=new User
         {

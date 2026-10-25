@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using BMS.Api.Hubs;
+using BMS.Api.Middleware;
 
 var builder=WebApplication.CreateBuilder(args);
 
@@ -144,7 +145,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
 }
-app.UseExceptionHandler("/error");
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
