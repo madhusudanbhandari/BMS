@@ -10,6 +10,8 @@ using Microsoft.OpenApi;
 using BMS.Api.Hubs;
 using BMS.Api.Middleware;
 using BMS.Application.Mapping;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder=WebApplication.CreateBuilder(args);
 
@@ -130,6 +132,30 @@ builder.Services.AddCors(options =>
     }); 
 });
 
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode=StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("LoginRateLimit", httpContext =>
+    {
+        var clientIp=httpContext.Connection.RemoteIpAddress?.ToString()??"Unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey:clientIp,
+            factory:_=>new FixedWindowRateLimiterOptions
+            {
+                PermitLimit=5,
+                Window=TimeSpan.FromMinutes(1),
+                AutoReplenishment=true,
+                QueueLimit=0
+
+            }
+        );
+    });
+});
+
+
 var app=builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -160,6 +186,8 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapHub<ChatHub>("/chatHub");
 

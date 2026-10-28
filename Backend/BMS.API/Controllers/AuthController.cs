@@ -3,6 +3,7 @@ using BMS.Application.Dtos;
 using BMS.Application.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BMS.Api.Controller;
 
@@ -25,6 +26,7 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
+    [EnableRateLimiting("LoginRateLimit")]
     [AllowAnonymous]
     [HttpPost("login-user")]
     public async Task<IActionResult> LoginUserAsync(UserLoginRequest request)
