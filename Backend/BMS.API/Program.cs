@@ -12,6 +12,7 @@ using BMS.Api.Middleware;
 using BMS.Application.Mapping;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 var builder=WebApplication.CreateBuilder(args);
 
@@ -84,7 +85,42 @@ builder.Services.AddAuthentication(
             return Task.CompletedTask;
         }
     };
+})//temporary cookie foe google login process
+.AddCookie("External", options =>
+{
+    options.Cookie.Name="BMS.External";
+    options.Cookie.HttpOnly=true;
+    options.Cookie.SecurePolicy=CookieSecurePolicy.Always;
+    options.Cookie.SameSite=SameSiteMode.Lax;
+    options.ExpireTimeSpan=TimeSpan.FromMinutes(5);
+    options.SlidingExpiration=false;
+})//Google OpenId connect
+.AddOpenIdConnect("Google", options =>
+{
+    options.Authority="https://accounts.google.com";
+
+    options.ClientId=builder.Configuration["Authentication:Google:ClientId"]!;
+    options.ClientSecret=builder.Configuration["Authentication:Google:ClientSecret"]!;
+    options.SignInScheme="External";
+    options.CallbackPath="/signin-google";
+    options.ResponseType=OpenIdConnectResponseType.Code;
+    options.UsePkce=true; //proof key for code exchange
+
+    //request only identity information
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+
+    options.SaveTokens=false;
+
+    options.TokenValidationParameters=new TokenValidationParameters
+    {
+        NameClaimType="name"
+    };
 });
+
+
 
 builder.Services.AddAutoMapper(
     cfg=>{},

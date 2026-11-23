@@ -221,4 +221,48 @@ public class AuthService : IAuthService
         await _authRepository.SaveChangesAsync();
         return true;
     }
+
+    public async Task<UserResponse> GoogleLogin(
+        string googleId, string email, string firstName,string LastName
+    )
+    {
+        var user=await _authRepository.GetUserByGoogleId(googleId);
+
+        if (user == null)
+        {
+             user=await _authRepository.GetUserByEmailAsync(email);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Cannot find the user..register first");
+            }
+
+            if(!string.IsNullOrWhiteSpace(user.GoogleId) && googleId != user.GoogleId)
+            {
+                throw new BadRequestException("The googleId is linked to anothet user ");
+            }
+
+            user.GoogleId=googleId;
+            await _authRepository.SaveChangesAsync();
+        }
+
+        if (UserStatus.Approved != user.Status)
+        {
+            throw new BadRequestException("Yor BMS account is not verified");
+        }
+
+        return new UserResponse
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            OrganizationId = user.OrganizationId,
+            Role = user.Role.ToString(),
+            Token = _tokenService.GenerateTokenAsync(user)
+        };
+
+
+        
+    }
 }

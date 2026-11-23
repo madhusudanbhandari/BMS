@@ -12,4 +12,6 @@ public interface IAuthRepository
 
     Task DeleteUserAsync(User user);
     Task SaveChangesAsync();
+
+    public Task<User?> GetUserByGoogleId(string googleId);
 }

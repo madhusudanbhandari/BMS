@@ -11,4 +11,11 @@ public interface IAuthService
     Task<UserResponse> UpdateUserAsync(string requestEmail,string targetEmail,UpdateUserDto dto);
     Task<bool?> DeleteUserAsync(string requestEmail,string targetEmail);
    // Task<User?> ViewUserAsync();
+
+   Task<UserResponse> GoogleLogin(
+    string googleId,
+    string email,
+    string firstName,
+    string lastName
+   );
 }

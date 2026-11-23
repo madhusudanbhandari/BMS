@@ -130,6 +130,10 @@ public class BmsDbContext : DbContext
                     .WithMany()
                     .HasForeignKey(c=>c.ReceiverId)
                     .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<User>()
+                    .HasIndex(u=>u.GoogleId)
+                    .IsUnique();
 
 
     }

@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using BMS.Application.Dtos;
 using BMS.Application.Interface;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -81,4 +83,73 @@ public class AuthController : ControllerBase
 
         return Ok(deleted);
     }
-}
+
+    [AllowAnonymous]
+    [HttpGet("google-login")]
+    public IActionResult GoogleLogin()
+    {
+        var properties=new AuthenticationProperties
+        {
+            RedirectUri=Url.Action(nameof(GoogleCallback))
+
+        };
+
+        return Challenge(properties,"Google");
+    }
+
+    [AllowAnonymous]
+    [HttpGet("google-callback")]
+    public async Task<IActionResult> GoogleCallback()
+    {
+        var result = await HttpContext.AuthenticateAsync("External");
+
+        if (!result.Succeeded || result.Principal == null)
+        {
+            return Unauthorized(new
+            {
+                message = "Google authentication failed."
+            });
+        }
+
+        var principal = result.Principal;
+
+        var googleId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+
+        var firstName = principal.FindFirst(ClaimTypes.GivenName)?.Value;
+        var lastName = principal.FindFirst(ClaimTypes.Surname)?.Value;
+
+        var emailVerified = principal.FindFirst("email_verified")?.Value;
+
+        await HttpContext.SignOutAsync("External");
+
+        if (string.IsNullOrWhiteSpace(googleId) ||
+            string.IsNullOrWhiteSpace(email))
+        {
+            return BadRequest(new
+            {
+                message = "Required Google claims are missing."
+            });
+        }
+
+        if (!string.Equals(
+            emailVerified,
+            "true",
+            StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                message = "Google email is not verified."
+            });
+        }
+
+        var response = await _authService.GoogleLogin(
+            googleId,
+            email,
+            firstName ?? string.Empty,
+            lastName ?? string.Empty
+        );
+
+        return Ok(response);
+    }
+    }

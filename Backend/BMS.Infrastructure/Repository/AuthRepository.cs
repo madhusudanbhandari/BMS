@@ -51,4 +51,10 @@ public class AuthRepository : IAuthRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<User?> GetUserByGoogleId(string googleId)
+    {
+    return await _context.Users.FirstOrDefaultAsync(u=>u.GoogleId==googleId);
+                                  
+    }
 }
